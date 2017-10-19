@@ -1,0 +1,3 @@
+[submodule "3rd_party/Papageno"]
+	path = 3rd_party/Papageno
+	url = https://github.com/noseglasses/papageno
