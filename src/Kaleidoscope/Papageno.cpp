@@ -19,100 +19,30 @@
 #include <Kaleidoscope-Papageno.h>
 #include <kaleidoscope/hid.h>
 
-namespace kaleidoscope {
-
-// --- api ---
-
-   Papageno
-      ::Papageno()
-{
-}
-
-void 
-   Papageno
-      ::begin() 
-{
-   this->setupPapageno();
-   
-   Kaleidoscope.useEventHandlerHook(Papageno::eventHandlerHook);
-   Kaleidoscope.useLoopHook(Papageno::loopHook);
-}
-
-void
-   Papageno
-      ::setupPapageno()
-{
-   // Setup Papageno patterns
-   // Call a user callback that performs the setup of a papageno context
-   // that is used for pattern matching
-   
-   // TODO: Make this a weak function
-   //
-   papageno_setup();
-}
-
-// --- hooks ---
-
-Key 
-   Papageno
-      ::eventHandlerHook(Key mapped_key, byte row, byte col, uint8_t key_state)
-{
-   // Make the current layer available for Papageno
-   
-   ppg_kls_set_current_layer(how to retreive the layer?);
-   
-   // Pass key and matrix position to Papageno
-   
-   TODO: Papageno needs a callback that enables flushing the keys
-   
-   How can keycodes be passed to Kaleidoscope?
-   
-   return Key_NoKey;
-}
-
-void
-   Papageno
-      ::loopHook(bool is_post_clear)
-{
-   // Call the papageno timeout check function
-}
-
-}
-
 __attribute__((weak)) 
 void papageno_setup();
 
 kaleidoscope::Papageno Papageno;
 
-#define PPG_IMMEDIATE_EVENT_PROCESSING
+namespace kaleidoscope {
 
-#ifndef PPG_IMMEDIATE_EVENT_PROCESSING
-static PPG_Event ppg_kls_flush_queue[30];
-static uint8_t ppg_kls_flush_queue_end;
-#endif
+namespace PPG_Private {
+
+static PPG_Event flushQueue_[30];
+static uint8_t flushQueueEnd_;
 
 inline
-static uint8_t ppg_kls_get_keystate(bool pressed)
+static uint8_t getKeystate(bool pressed)
 {
    return ((pressed) ? IS_PRESSED : 0) | INJECTED;
 }
 
-static void ppg_kls_enter_keycode(Key keycode, 
-                                  bool pressed
-                                 )
+static void flushEvent(PPG_Event *event)
 {
-   uint8_t keyState = ((pressed) ? IS_PRESSED : 0) | INJECTED;
-   
-   // Note: Setting ROWS, COLS will skit keymap lookup
-   //
-   handleKeyswitchEvent(keycode, ROWS, COLS, keyState);
-}
+   int16_t highest_keypos = highestKeyposInputId();
 
-static void ppg_kls_flush_event(PPG_Event *event)
-{
-   int16_t highest_keypos = ppg_kls_highest_keypos_input();
-
-   uint8_t keyState = ppg_kls_get_keystate(pressed);
+   uint8_t keyState = kaleidoscope::PPG_Private::getKeystate(
+      event->flags & PPG_Event_Active);
       
    // Note: Input-IDs are assigned contiguously
    //
@@ -125,10 +55,11 @@ static void ppg_kls_flush_event(PPG_Event *event)
       // Map the input to a range starting from zero to be suitable
       // for lookup in the ppg_kls_keycode_lookup array
       //
-      uint16_t keycode = ppg_kls_keycode_lookup[event->input - highest_keypos - 1];
+      Key keycode = ppg_kls_keycode_lookup[event->input - highest_keypos - 1];
       
       // Note: Setting ROWS, COLS will skip keymap lookup
       //
+//       handleKeyswitchEvent((Key_){ .raw = keycode}, ROWS, COLS, keyState);
       handleKeyswitchEvent(keycode, ROWS, COLS, keyState);
    }
    else {
@@ -140,7 +71,7 @@ static void ppg_kls_flush_event(PPG_Event *event)
    }
 }
 
-void ppg_kls_process_event_callback(   
+static void processEventCallback(   
                               PPG_Event *event,
                               void *user_data)
 {
@@ -151,44 +82,95 @@ void ppg_kls_process_event_callback(
       return; 
    }
 
-   ppg_kls_flush_queue[ppg_kls_flush_queue_end] = *event;
-   ++ppg_kls_flush_queue_end;
+   PPG_Private::flushQueue_[PPG_Private::flushQueueEnd_] = *event;
+   
+   ++PPG_Private::flushQueueEnd_;
 }
 
-void ppg_kls_flush_events(void)
+static void flushEvents()
 {  
    ppg_event_buffer_iterate(
-      ppg_kls_process_event_callback,
+      processEventCallback,
       NULL
    );
 }
 
-void ppg_kls_process_keycode(bool activation, void *user_data) {
+static void delayedFlushEvents()
+{
+   if(PPG_Private::flushQueueEnd_ == 0) { return; }
    
-   Key keycode = (Key)user_data;
+   uint8_t fqe = PPG_Private::flushQueueEnd_;
+   PPG_Private::flushQueueEnd_ = 0;
+   
+   for(uint8_t i = 0; i < fqe; ++i) {
+
+      PPG_Event *event = PPG_Private::flushQueue_ + i;
       
-   uint8_t keyState = ppg_kls_get_keystate(pressed);
-   
-   // Note: Setting ROWS, COLS will skip keymap lookup
-   //
-   handleKeyswitchEvent(keycode, ROWS, COLS, keyState);
+      flushEvent(event);
+   }
 }
 
-void ppg_kls_process_event(Key mappedKey, byte row, byte col, uint8_t keyState)
+static void time(PPG_Time *time)
+{
+   uint16_t time_tmp = millis();
+   *time = *((PPG_Time*)&time_tmp);
+}
+
+static void timeDifference(PPG_Time time1, PPG_Time time2, PPG_Time *delta)
+{
+   uint16_t *delta_t = (uint16_t *)delta;
+   
+   *delta_t = (uint16_t)time2 - (uint16_t)time1; 
+}
+
+static int8_t timeComparison(
+                        PPG_Time time1,
+                        PPG_Time time2)
+{
+   if((uint16_t)time1 > (uint16_t)time2) {
+      return 1;
+   }
+   else if((uint16_t)time1 == (uint16_t)time2) {
+      return 0;
+   }
+    
+   return -1;
+}
+
+static void signalCallback(PPG_Signal_Id signal_id, void *user_data)
+{
+//    uprintf("signal %u\n", signal_id  );
+   
+   switch(signal_id) {
+      case PPG_On_Abort:
+         PPG_Private::flushEvents();
+         break;
+      case PPG_On_Timeout:
+         PPG_Private::flushEvents();
+         break;
+      case PPG_On_Match_Failed:
+         break;      
+      case PPG_On_Flush_Events:
+         PPG_Private::flushEvents();
+         break;
+      default:
+         return;
+   }
+   #ifdef PPG_KLS_ERGODOX_EZ
+   code_key_blocked();
+   #endif
+} 
+
+
+static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
 {   
-   
-   ...TODO
-   
-   
-   uint16_t keycode = keymap_key_to_keycode(layer_switch_get_layer(event.key), event.key);
-   
    #define PPG_KLS_INPUT_CHECK_A \
-__NL__   ppg_kls_input_id_from_keypos( \
-__NL__                        event.key.row, \
-__NL__                        event.key.col)
+  inputIdFromKeypos( \
+                       row, \
+                       col)
 
    #define PPG_KLS_INPUT_CHECK_B \
-         ppg_kls_input_id_from_keycode(keycode)
+         inputIdFromKeycode(keycode)
          
    // The default behavior is to first check it an 
    // input is defined through the keypos of a key.
@@ -220,13 +202,9 @@ __NL__                        event.key.col)
          //
          ppg_global_abort_pattern_matching();
          
-         
-         
-         // Let qmk process the key in a regular way
+         // Let Kaleidoscope process the key in a regular way
          //
-         action_exec(event);
-         
-         return;
+         return keycode;
       }
       else {
          PPG_LOG("input %u, keycode %d\n", input, keycode);
@@ -236,84 +214,87 @@ __NL__                        event.key.col)
 //    uprintf("input %u, row %u, col %u\n", input, record->event.key.row, 
 //                         record->event.key.col);
 //   }
-   
-   #ifdef PPG_KLS_ERGODOX_EZ
-   ppg_kls_code_key_considered();
-   #endif
-   
+ 
    PPG_Event p_event = {
       .input = input,
-      .time = (PPG_Time)event.time,
-      .flags = (event.pressed) 
-                     ? PPG_Event_Active : PPG_Event_Flags_Empty
+      .time = (PPG_Time)millis(),
+      .flags = (key_state & IS_PRESSED)
+                  ? PPG_Event_Active : PPG_Event_Flags_Empty
    };
    
-   uint8_t cur_layer = biton32(layer_state);
+   uint8_t cur_layer = Layer.top();
    
    ppg_global_set_layer(cur_layer);
    
    ppg_event_process(&p_event);
-}
-
-void ppg_kls_time(PPG_Time *time)
-{
-   uint16_t time_tmp = timer_read();
-   *time = *((PPG_Time*)&time_tmp);
-}
-
-void  ppg_kls_time_difference(PPG_Time time1, PPG_Time time2, PPG_Time *delta)
-{
-   uint16_t *delta_t = (uint16_t *)delta;
    
-   *delta_t = (uint16_t)time2 - (uint16_t)time1; 
+   return Key_NoKey;
 }
 
-int8_t ppg_kls_time_comparison(
-                        PPG_Time time1,
-                        PPG_Time time2)
+static void loopHook(bool is_post_clear)
 {
-   if((uint16_t)time1 > (uint16_t)time2) {
-      return 1;
+   if(!is_post_clear) {
+      delayedFlushEvents();
+      ppg_timeout_check();
    }
-   else if((uint16_t)time1 == (uint16_t)time2) {
-      return 0;
-   }
-    
-   return -1;
 }
 
-void ppg_kls_signal_callback(PPG_Signal_Id signal_id, void *user_data)
+} // end namespace PPG_Private
+
+void 
+   Papageno
+      ::begin() 
 {
-//    uprintf("signal %u\n", signal_id  );
+   // Call the possibly overridden user initialization function
+   //
+   papageno_setup();
    
-   switch(signal_id) {
-      case PPG_On_Abort:
-         ppg_kls_flush_events();
-         break;
-      case PPG_On_Timeout:
-         ppg_kls_flush_events();
-         break;
-      case PPG_On_Match_Failed:
-         break;      
-      case PPG_On_Flush_Events:
-         ppg_kls_flush_events();
-         break;
-      default:
-         return;
-   }
-   #ifdef PPG_KLS_ERGODOX_EZ
-   ppg_kls_code_key_blocked();
-   #endif
+   Kaleidoscope.useEventHandlerHook(
+         kaleidoscope::PPG_Private::eventHandlerHook);
+   
+   Kaleidoscope.useLoopHook(
+         kaleidoscope::PPG_Private::loopHook);
 }
 
-// void ppg_kls_set_timeout_ms(uint16_t timeout)
-// {
-//    printf("ppg_kls_set_timeout_ms: %d\n", (int)timeout);
-//    ppg_global_set_timeout((PPG_Time)timeout);
-// }
-
-void ppg_kls_loop_hook(void)
+void 
+   Papageno
+      ::init()
 {
-   ppg_timeout_check();
+   ppg_global_set_default_event_processor(
+      (PPG_Event_Processor_Fun)kaleidoscope::PPG_Private::processEventCallback);
+
+   ppg_global_set_signal_callback(
+      (PPG_Signal_Callback) {
+            .func = (PPG_Signal_Callback_Fun)kaleidoscope::PPG_Private::signalCallback,
+            .user_data = NULL
+      }
+   );
+
+   ppg_global_set_time_manager(
+      (PPG_Time_Manager) {
+         .time
+            = (PPG_Time_Fun)kaleidoscope::PPG_Private::time,
+         .time_difference
+            = (PPG_Time_Difference_Fun)kaleidoscope::PPG_Private::timeDifference,
+         .compare_times
+            = (PPG_Time_Comparison_Fun)kaleidoscope::PPG_Private::timeComparison
+      }
+   );
 }
 
+void  
+   Papageno
+      ::processKeycode(bool activation, void *user_data)
+{   
+   Key keycode 
+      = (Key){ .raw 
+            = reinterpret_cast<uint16_t>(user_data)};
+      
+   uint8_t keyState = kaleidoscope::PPG_Private::getKeystate(activation);
+   
+   // Note: Setting ROWS, COLS will skip keymap lookup
+   //
+   handleKeyswitchEvent(keycode, ROWS, COLS, keyState);
+}
+
+} // end namepace kaleidoscope

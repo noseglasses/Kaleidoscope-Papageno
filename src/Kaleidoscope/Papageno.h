@@ -20,45 +20,11 @@
 
 #include <Kaleidoscope.h>
 
-namespace kaleidoscope {
-class Papageno : public KaleidoscopePlugin {
- public:
-
-  Papageno(void);
-
-  void begin(void) final;
-
- private:
-
-  static Key eventHandlerHook(Key mapped_key, byte row, byte col, uint8_t key_state);
-  static void loopHook(bool is_post_clear);
-};
-
-}
-
-// Override this function to setup Papageno patterns
+// avr-gcc compiles files with .c ending with C name mangling
 //
-void papageno_setup();
-
-extern kaleidoscope::Papageno Papageno;
-
-/**
- * This is an interface to the Papageno library. It allows for using 
- * Papageno magic melodies as part of the qmk firmware.
- * 
- * As Papageno's definition of what is an input is very arbitrary, it is possible to
- * use keyboard matix coordinates as well as qmk keycodes to define keys (=inputs in Papageno jargon).
- * 
- * Key press and release actions are passed to Papageno.
- * Use the macro PPG_KLS_INPUT_FROM_KEYPOS_ALIAS to specify a physical key with respect to its
- * hexadecimal row and column ids or the macro PPG_KLS_KEYCODE_KEY to specify a qmk keycode
- * as key identifier.
- * 
- * Please note that layer switching aborts
- * matching of the current pattern and flushes all keypress events that queued up.
-*/
-
-#include "papageno.h"
+extern "C" {
+ #include "papageno.h"
+}
 
 #ifdef PAPAGENO_COMPRESSION_ENABLED
 #define PPG_CALLBACK__(...) { return __VA_ARGS__; }
@@ -71,57 +37,56 @@ typedef struct {
    byte col;
 } PPG_KLS_Keypos;
 
-// The following extern entities are defined through preprocessor
-// macros in the keymap
-//
-extern PPG_KLS_Keypos ppg_kls_keypos_lookup[];
-extern uint16_t ppg_kls_keycode_lookup[];
-
-
-extern PPG_Input_Id ppg_kls_input_id_from_keypos(byte row, byte col);
-extern PPG_Input_Id ppg_kls_input_id_from_keycode(Key keycode);
-
-extern int16_t ppg_kls_highest_keypos_input(void);
-
-void ppg_kls_process_event_callback(   
-                        PPG_Event *key_event,
-                        void *user_data) PPG_CALLBACK__()
-
-void ppg_kls_signal_callback(PPG_Signal_Id signal_id, void *user_data) PPG_CALLBACK__()
-
-void ppg_kls_flush_key_events(void);
-
-void ppg_kls_process_keycode(bool activation, void *user_data) PPG_CALLBACK__()
-
-void ppg_kls_process_event(Key mapped_key, byte row, byte col, uint8_t key_state);
-
-void ppg_kls_time(         PPG_Time *time) PPG_CALLBACK__()
-
-void  ppg_kls_time_difference(
-                        PPG_Time time1,
-                        PPG_Time time2,
-                        PPG_Time *delta) PPG_CALLBACK__()
-
-int8_t ppg_kls_time_comparison(
-                        PPG_Time time1,
-                        PPG_Time time2) PPG_CALLBACK__(0)
-
-inline
-void ppg_kls_set_timeout_ms(uint16_t timeout)
+namespace kaleidoscope {
+   
+class Papageno : public KaleidoscopePlugin
 {
-   ppg_global_set_timeout((PPG_Time)timeout);
+   public:
+      
+      void begin() final;
+      
+      static void init();
+            
+      // Some utility functions required by Papageno's API
+      //
+      static void processKeycode(bool activation, void *user_data) PPG_CALLBACK__()
+
+      inline
+      static void setTimeoutMillis(uint16_t timeout)
+      {
+         ppg_global_set_timeout((PPG_Time)timeout);
+      }
+      
+   private:
+
+      static Key eventHandlerHook(Key mapped_key, byte row, byte col, uint8_t key_state);
+      static void loopHook(bool is_post_clear);
+};
+
 }
 
-void ppg_kls_loop_hook(void);
+// Override this function to setup your own Papageno patterns
+//
+void papageno_setup();
 
-/* Call this to flush key events that
- * were encountered by papageno
- */
-void ppg_kls_flush_key_events(void);
+extern kaleidoscope::Papageno Papageno;
 
 enum { PPG_KLS_Not_An_Input = (PPG_Input_Id)-1 };
 
-// Note: Preprocessor macro functions can be 
+// The following extern entities are defined through preprocessor
+// macros below, e.g. from papageno_setup
+//
+extern PPG_KLS_Keypos ppg_kls_keypos_lookup[];
+extern Key ppg_kls_keycode_lookup[];
+
+extern PPG_Input_Id inputIdFromKeypos(byte row, byte col);
+extern PPG_Input_Id inputIdFromKeycode(Key keycode);
+
+extern int16_t highestKeyposInputId();
+
+// A note on the use of the __NL__ macro below:
+//
+//       Preprocessor macro functions can be 
 //       hard to debug.
 //
 //       One approach is to take a look at
@@ -157,9 +122,9 @@ enum { PPG_KLS_Not_An_Input = (PPG_Input_Id)-1 };
 __NL__   PPG_Compression_Context ccontext =  \
 __NL__              ppg_compression_init(); \
 __NL__   \
-__NL__   PPG_KLS_COMPRESSION_REGISTER_SYMBOL(ppg_kls_process_keycode) \
+__NL__   PPG_KLS_COMPRESSION_REGISTER_SYMBOL(kaleidoscope::Papageno::processKeycode) \
 __NL__   PPG_KLS_COMPRESSION_REGISTER_SYMBOL(  \
-                                       ppg_kls_process_event_callback)
+                                       kaleidoscope::Papageno::processEventCallback)
 
    #define PPG_KLS_COMPRESSION_RUN \
 __NL__   ppg_compression_run(ccontext, "kaleidoscope"); \
@@ -169,7 +134,7 @@ __NL__   ppg_compression_finalize(ccontext);
       REGISTRATION_MFUNC(PPG_KLS_COMPRESSION_REGISTER_SYMBOL)
       
    #define PPG_KLS_COMPRESSION_CALLBACK_STUB(NAME) \
-      void NAME(void) {}
+      void NAME() {}
       
    #define PPG_KLS_COMPRESSION_PREPARE_SYMBOLS(REGISTRATION_MFUNC) \
       REGISTRATION_MFUNC(PPG_KLS_COMPRESSION_CALLBACK_STUB)
@@ -195,39 +160,16 @@ __NL__   PPG_KLS_COMPRESSION_RUN
 #define PPG_KLS_ACTION_KEYCODE(KK) \
 __NL__   (PPG_Action) { \
 __NL__      .callback = (PPG_Action_Callback) { \
-__NL__         .func = (PPG_Action_Callback_Fun)ppg_kls_process_keycode,  \
-__NL__         .user_data = (void*)(uint16_t)ppg_kls_report_keycode(KK) \
+__NL__         .func = (PPG_Action_Callback_Fun)kaleidoscope::Papageno::processKeycode,  \
+__NL__         .user_data = reinterpret_cast<void*>(KK.raw) \
 __NL__      } \
 __NL__   }
-
-#define PPG_KLS_SETUP_NON_DEFAULT_MANAGERS \
-__NL__   \
-__NL__   ppg_global_set_default_event_processor( \
-__NL__      (PPG_Event_Processor_Fun)ppg_kls_process_event_callback); \
-__NL__   \
-__NL__   ppg_global_set_signal_callback( \
-__NL__      (PPG_Signal_Callback) { \
-__NL__            .func = (PPG_Signal_Callback_Fun)ppg_kls_signal_callback, \
-__NL__            .user_data = NULL \
-__NL__      } \
-__NL__   ); \
-__NL__   \
-__NL__   ppg_global_set_time_manager( \
-__NL__      (PPG_Time_Manager) { \
-__NL__         .time \
-__NL__            = (PPG_Time_Fun)ppg_kls_time, \
-__NL__         .time_difference \
-__NL__            = (PPG_Time_Difference_Fun)ppg_kls_time_difference, \
-__NL__         .compare_times \
-__NL__            = (PPG_Time_Comparison_Fun)ppg_kls_time_comparison \
-__NL__      } \
-__NL__   ); \
 
 #define PPG_KLS_INIT \
 __NL__   \
 __NL__   ppg_global_init(); \
 __NL__   \
-__NL__   PPG_KLS_SETUP_NON_DEFAULT_MANAGERS \
+__NL__   kaleidoscope::Papageno::init(); \
 __NL__   \
 __NL__   PPG_KLS_INIT_COMPRESSION
    
@@ -256,7 +198,7 @@ __NL__      inputs are defined \
 __NL__   */ \
 __NL__   enum { PPG_Highest_Keypos_Input = (int16_t)(__COUNTER__) - PPG_Keypos_Input_Offset - 2 }; \
 __NL__   \
-__NL__   int16_t ppg_kls_highest_keypos_input(void) { \
+__NL__   int16_t highestKeyposInputId() { \
 __NL__      return PPG_Highest_Keypos_Input; \
 __NL__   }
 
@@ -289,7 +231,7 @@ __NL__      break;
    
 #define PPG_INIT_INPUT_ID_FROM_KEYPOS_FUNCTION \
 __NL__   \
-__NL__   PPG_Input_Id ppg_kls_input_id_from_keypos(byte row, byte col) \
+__NL__   PPG_Input_Id inputIdFromKeypos(byte row, byte col) \
 __NL__   { \
 __NL__      uint16_t id = 256*row + col; \
 __NL__      \
@@ -308,7 +250,7 @@ __NL__      break;
 
 #define PPG_INIT_INPUT_ID_FROM_KEYCODE_FUNCTION \
 __NL__   \
-__NL__   PPG_Input_Id ppg_kls_input_id_from_keycode(Key keycode) \
+__NL__   PPG_Input_Id inputIdFromKeycode(Key keycode) \
 __NL__   { \
 __NL__      switch(keycode.raw) { \
 __NL__         \
@@ -347,11 +289,11 @@ __NL__   Key ppg_kls_keycode_lookup[] = { \
 __NL__      \
 __NL__      PPG_KLS_KEYCODE_INPUTS(PPG_KLS_CONVERT_TO_KEYCODE_ARRAY_ENTRY) \
 __NL__      \
-__NL__      PPG_KLS_CONVERT_TO_KEYCODE_ARRAY_ENTRY_AUX((uint16_t)-1) \
+__NL__      PPG_KLS_CONVERT_TO_KEYCODE_ARRAY_ENTRY_AUX((Key){ .raw = (uint16_t)-1}) \
 __NL__   };
    
 #define PPG_KLS_INPUT_FROM_KEYPOS_CALL(COL_HEX, ROW_HEX) \
-   ppg_kls_input_id_from_keypos(0x##ROW_HEX, 0x##COL_HEX)
+   inputIdFromKeypos(0x##ROW_HEX, 0x##COL_HEX)
    
 #define PPG_KLS_INPUT_FROM_KEYPOS_ALIAS(KEYPOS_ALIAS) \
    PPG_KLS_KEYPOS_ENUM(KEYPOS_ALIAS)
@@ -386,16 +328,16 @@ __NL__   PPG_KLS_STORE_N_INPUTS
 
 #define PPG_KLS_CONNECT \
 __NL__   \
-__NL__   void matrix_init_user(void) { \
+__NL__   void matrix_init_user() { \
 __NL__      init_papageno(); \
 __NL__   } \
 __NL__   \
-__NL__   void matrix_scan_user(void) { \
-__NL__      ppg_kls_matrix_scan(); \
+__NL__   void matrix_scan_user() { \
+__NL__      matrix_scan(); \
 __NL__   }; \
 __NL__   \
 __NL__   void action_exec_user(keyevent_t event) { \
-__NL__      ppg_kls_process_event(event); \
+__NL__      process_event(event); \
 __NL__   }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -508,7 +450,7 @@ __NL__       */ \
 __NL__      /*NULL*/ \
 __NL__   )
 
-#define PPG_KLS_AGGREGATE__(TYPE, LAYER, ACTION, NOTE_GENERATOR, ACTION_GENERATOR, ...) \
+#define PPG_KLS_AGGREGATE__(TYPE, LAYER, ACTION, ACTION_GENERATOR, ...) \
 \
 __NL__   ppg_##TYPE(  \
 __NL__      (LAYER), \
@@ -527,7 +469,6 @@ __NL__   )
                         chord, \
                         LAYER, \
                         ACTION, \
-                        PPG_KLS_KEYPOS_AGGREGATE_MEMBER__, \
                         PPG_KLS_ACTION_GENERATOR_KEYCODE,   \
                         __VA_ARGS__ \
    )
@@ -537,7 +478,6 @@ __NL__   )
                         chord,  \
                         LAYER,  \
                         ACTION,  \
-                        PPG_KLS_KEYCODE_AGGREGATE_MEMBER__,  \
                         PPG_KLS_ACTION_GENERATOR_KEYCODE,  \
                         __VA_ARGS__ \
    )
@@ -551,7 +491,6 @@ __NL__   )
                         cluster, \
                         LAYER, \
                         ACTION, \
-                        PPG_KLS_KEYPOS_AGGREGATE_MEMBER__, \
                         PPG_KLS_ACTION_GENERATOR_KEYCODE, \
                         __VA_ARGS__ \
    )
@@ -561,9 +500,6 @@ __NL__   )
                         cluster,  \
                         LAYER,  \
                         ACTION,  \
-                        PPG_KLS_KEYCODE_AGGREGATE_MEMBER__,  \
                         PPG_KLS_ACTION_GENERATOR_KEYCODE,  \
                         __VA_ARGS__ \
    )
-                
-#endif
