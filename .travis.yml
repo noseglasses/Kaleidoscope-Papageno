@@ -10,13 +10,15 @@ script:
   - cd Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno
   - mkdir -p build/atmega32u4
   - cd build/atmega32u4
-  - cmake -DCMAKE_TOOLCHAIN_FILE=$PWD/../../cmake/toolchains/Toolchain-avr-gcc.cmake \
+  - cmake \
+      -DCMAKE_TOOLCHAIN_FILE=$PWD/../../cmake/toolchains/Toolchain-avr-gcc.cmake \
       -DPAPAGENO_PLATFORM=atmega32u4 \
-      -DPAPAGENO_ADDITIONAL_INCLUDE_PATHS=$PWD/../../../../tmk_core/common \
       ../..
+  - mkdir -p $HOME/Arduino/libraries
   - cd $HOME/Arduino/libraries
   - ln -s ../hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno/build/atmega32u4/arduino Papageno
-  - make travis-test BOARD_HARDWARE_PATH=$(pwd)/hardware
+  - cd $HOME/Arduino/Model01-Firmware
+  - make
 notifications:
   email:
     recipients:
