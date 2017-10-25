@@ -3,10 +3,19 @@ sudo: false
 os:
   - linux
 install:
-  - git clone --depth 1 --recurse-submodules https://github.com/keyboardio/Arduino-Boards hardware/keyboardio/avr
-  - git clone https://github.com/noseglasses/Model01-Firmware-Papageno-Test.git Model01-Firmware
-  - git clone https://github.com/noseglasses/Kaleidoscope_Papageno.git keyboardio/Arduino-Boards hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno
+  - git clone --depth 1 --recurse-submodules https://github.com/keyboardio/Arduino-Boards Arduino/hardware/keyboardio/avr
+  - git clone https://github.com/noseglasses/Model01-Firmware-Papageno-Test.git Arduino/Model01-Firmware
+  - git clone --depth 1 --recurse-submodules https://github.com/noseglasses/Kaleidoscope_Papageno.git keyboardio/Arduino-Boards Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno
 script:
+  - cd Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno
+  - mkdir -p build/atmega32u4
+  - cd build/atmega32u4
+  - cmake -DCMAKE_TOOLCHAIN_FILE=$PWD/../../cmake/toolchains/Toolchain-avr-gcc.cmake \
+      -DPAPAGENO_PLATFORM=atmega32u4 \
+      -DPAPAGENO_ADDITIONAL_INCLUDE_PATHS=$PWD/../../../../tmk_core/common \
+      ../..
+  - cd $HOME/Arduino/libraries
+  - ln -s ../hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno/build/atmega32u4/arduino Papageno
   - make travis-test BOARD_HARDWARE_PATH=$(pwd)/hardware
 notifications:
   email:
