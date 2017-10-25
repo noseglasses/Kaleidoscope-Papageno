@@ -11,8 +11,8 @@ install:
   - cd $HOME/Downloads
   - wget https://downloads.arduino.cc/arduino-1.8.5-linux64.tar.xz
   - tar -xvf arduino-1.8.5-linux64.tar.xz
-  - sudo mv arduino-1.8.5-linux64 /opt
-  - cd /opt/arduino-1.8.5-linux64
+  - sudo mv arduino-1.8.5 /opt
+  - cd /opt/arduino-1.8.5
   - chmod +x install.sh
   - ./install.sh
 script:
