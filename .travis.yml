@@ -7,6 +7,7 @@ install:
   - git clone --depth 1 --recurse-submodules https://github.com/keyboardio/Arduino-Boards Arduino/hardware/keyboardio/avr
   - git clone https://github.com/noseglasses/Model01-Firmware-Papageno-Test.git Arduino/Model01-Firmware
   - git clone --depth 1 --recurse-submodules https://github.com/noseglasses/Kaleidoscope_Papageno.git Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno
+  - mkdir -p $HOME/Downloads
   - cd $HOME/Downloads
   - wget https://downloads.arduino.cc/arduino-1.8.5-linux64.tar.xz
   - tar -xvf arduino-1.8.5-linux64.tar.xz
