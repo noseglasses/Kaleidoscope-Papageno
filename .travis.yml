@@ -5,7 +5,7 @@ os:
 install:
   - cd $HOME
   - git clone --depth 1 --recurse-submodules https://github.com/keyboardio/Arduino-Boards Arduino/hardware/keyboardio/avr
-  - git clone https://github.com/noseglasses/Model01-Firmware-Papageno-Test.git Arduino/Model01-Firmware
+  - git clone --depth 1 https://github.com/noseglasses/Model01-Firmware-Papageno-Test.git Arduino/Model01-Firmware
   - git clone --depth 1 --recurse-submodules https://github.com/noseglasses/Kaleidoscope_Papageno.git Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno
   - mkdir -p $HOME/Downloads
   - cd $HOME/Downloads
@@ -16,7 +16,7 @@ install:
   - chmod +x install.sh
   - ./install.sh
 script:
-  - cd Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno
+  - cd $HOME/Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno
   - ls -l
   - mkdir -p build/atmega32u4
   - cd build/atmega32u4
