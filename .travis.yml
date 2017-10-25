@@ -9,8 +9,10 @@ install:
   - git clone --depth 1 --recurse-submodules https://github.com/noseglasses/Kaleidoscope_Papageno.git Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno
 script:
   - cd Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno
+  - ls -l
   - mkdir -p build/atmega32u4
   - cd build/atmega32u4
+  - ls -l
   - cmake \
       -DCMAKE_TOOLCHAIN_FILE=$PWD/../../cmake/toolchains/Toolchain-avr-gcc.cmake \
       -DPAPAGENO_PLATFORM=atmega32u4 \
