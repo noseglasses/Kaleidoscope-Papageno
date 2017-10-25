@@ -27,8 +27,10 @@ script:
   - mkdir -p $HOME/Arduino/libraries
   - cd $HOME/Arduino/libraries
   - ln -s ../hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno/build/atmega32u4/arduino Papageno
+  - cd Papageno
+  - ls -l
   - cd $HOME/Arduino/Model01-Firmware
-  - make
+  - make VERBOSE=1
 notifications:
   email:
     recipients:
