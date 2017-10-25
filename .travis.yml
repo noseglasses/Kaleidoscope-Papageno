@@ -13,10 +13,7 @@ script:
   - mkdir -p build/atmega32u4
   - cd build/atmega32u4
   - ls -l
-  - cmake \
-      -DCMAKE_TOOLCHAIN_FILE=$PWD/../../cmake/toolchains/Toolchain-avr-gcc.cmake \
-      -DPAPAGENO_PLATFORM=atmega32u4 \
-      ../..
+  - cmake -DCMAKE_TOOLCHAIN_FILE=$PWD/../../cmake/toolchains/Toolchain-avr-gcc.cmake -DPAPAGENO_PLATFORM=atmega32u4 ../..
   - mkdir -p $HOME/Arduino/libraries
   - cd $HOME/Arduino/libraries
   - ln -s ../hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno/build/atmega32u4/arduino Papageno
