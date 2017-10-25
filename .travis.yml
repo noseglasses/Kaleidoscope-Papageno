@@ -7,13 +7,20 @@ install:
   - git clone --depth 1 --recurse-submodules https://github.com/keyboardio/Arduino-Boards Arduino/hardware/keyboardio/avr
   - git clone https://github.com/noseglasses/Model01-Firmware-Papageno-Test.git Arduino/Model01-Firmware
   - git clone --depth 1 --recurse-submodules https://github.com/noseglasses/Kaleidoscope_Papageno.git Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno
+  - cd $HOME/Downloads
+  - wget https://downloads.arduino.cc/arduino-1.8.5-linux64.tar.xz
+  - tar -xvf arduino-1.8.5-linux64.tar.xz
+  - sudo mv arduino-1.8.5-linux64 /opt
+  - cd /opt/arduino-1.8.5-linux64
+  - chmod +x install.sh
+  - ./install.sh
 script:
   - cd Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno
   - ls -l
   - mkdir -p build/atmega32u4
   - cd build/atmega32u4
   - ls -l
-  - cmake -DCMAKE_TOOLCHAIN_FILE=$PWD/../../cmake/toolchains/Toolchain-avr-gcc.cmake -DPAPAGENO_PLATFORM=atmega32u4 ../..
+  - cmake -DPAPAGENO_PLATFORM=atmega32u4 ../..
   - mkdir -p $HOME/Arduino/libraries
   - cd $HOME/Arduino/libraries
   - ln -s ../hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno/build/atmega32u4/arduino Papageno
