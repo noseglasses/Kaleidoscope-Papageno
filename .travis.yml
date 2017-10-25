@@ -3,6 +3,7 @@ sudo: false
 os:
   - linux
 install:
+  - cd $HOME
   - git clone --depth 1 --recurse-submodules https://github.com/keyboardio/Arduino-Boards Arduino/hardware/keyboardio/avr
   - git clone https://github.com/noseglasses/Model01-Firmware-Papageno-Test.git Arduino/Model01-Firmware
   - git clone --depth 1 --recurse-submodules https://github.com/noseglasses/Kaleidoscope_Papageno.git Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno
