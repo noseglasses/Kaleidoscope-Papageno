@@ -38,6 +38,7 @@ typedef struct {
 } PPG_KLS_Keypos;
 
 namespace kaleidoscope {
+namespace papageno {
    
 class Papageno : public KaleidoscopePlugin
 {
@@ -45,7 +46,7 @@ class Papageno : public KaleidoscopePlugin
       
       void begin() final;
       
-      static void init();
+      void init();
             
       // Some utility functions required by Papageno's API
       //
@@ -63,13 +64,14 @@ class Papageno : public KaleidoscopePlugin
       static void loopHook(bool is_post_clear);
 };
 
-}
+} // namespace papageno
+} // namespace kaleidoscope
 
 // Override this function to setup your own Papageno patterns
 //
 void papageno_setup();
 
-extern kaleidoscope::Papageno Papageno;
+extern kaleidoscope::papageno::Papageno Papageno;
 
 enum { PPG_KLS_Not_An_Input = (PPG_Input_Id)-1 };
 

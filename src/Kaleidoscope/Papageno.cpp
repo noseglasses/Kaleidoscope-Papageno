@@ -22,11 +22,10 @@
 __attribute__((weak)) 
 void papageno_setup();
 
-kaleidoscope::Papageno Papageno;
+kaleidoscope::papageno::Papageno Papageno;
 
 namespace kaleidoscope {
-
-namespace PPG_Private {
+namespace papageno {
 
 static PPG_Event flushQueue_[30];
 static uint8_t flushQueueEnd_;
@@ -41,7 +40,7 @@ static void flushEvent(PPG_Event *event)
 {
    int16_t highest_keypos = highestKeyposInputId();
 
-   uint8_t keyState = kaleidoscope::PPG_Private::getKeystate(
+   uint8_t keyState = kaleidoscope::papageno::getKeystate(
       event->flags & PPG_Event_Active);
       
    // Note: Input-IDs are assigned contiguously
@@ -82,9 +81,9 @@ static void processEventCallback(
       return; 
    }
 
-   PPG_Private::flushQueue_[PPG_Private::flushQueueEnd_] = *event;
+   papageno::flushQueue_[papageno::flushQueueEnd_] = *event;
    
-   ++PPG_Private::flushQueueEnd_;
+   ++papageno::flushQueueEnd_;
 }
 
 static void flushEvents()
@@ -97,14 +96,14 @@ static void flushEvents()
 
 static void delayedFlushEvents()
 {
-   if(PPG_Private::flushQueueEnd_ == 0) { return; }
+   if(papageno::flushQueueEnd_ == 0) { return; }
    
-   uint8_t fqe = PPG_Private::flushQueueEnd_;
-   PPG_Private::flushQueueEnd_ = 0;
+   uint8_t fqe = papageno::flushQueueEnd_;
+   papageno::flushQueueEnd_ = 0;
    
    for(uint8_t i = 0; i < fqe; ++i) {
 
-      PPG_Event *event = PPG_Private::flushQueue_ + i;
+      PPG_Event *event = papageno::flushQueue_ + i;
       
       flushEvent(event);
    }
@@ -143,15 +142,15 @@ static void signalCallback(PPG_Signal_Id signal_id, void *user_data)
    
    switch(signal_id) {
       case PPG_On_Abort:
-         PPG_Private::flushEvents();
+         papageno::flushEvents();
          break;
       case PPG_On_Timeout:
-         PPG_Private::flushEvents();
+         papageno::flushEvents();
          break;
       case PPG_On_Match_Failed:
          break;      
       case PPG_On_Flush_Events:
-         PPG_Private::flushEvents();
+         papageno::flushEvents();
          break;
       default:
          return;
@@ -239,8 +238,6 @@ static void loopHook(bool is_post_clear)
    }
 }
 
-} // end namespace PPG_Private
-
 void 
    Papageno
       ::begin() 
@@ -250,10 +247,10 @@ void
    papageno_setup();
    
    Kaleidoscope.useEventHandlerHook(
-         kaleidoscope::PPG_Private::eventHandlerHook);
+         kaleidoscope::papageno::eventHandlerHook);
    
    Kaleidoscope.useLoopHook(
-         kaleidoscope::PPG_Private::loopHook);
+         kaleidoscope::papageno::loopHook);
 }
 
 void 
@@ -261,11 +258,11 @@ void
       ::init()
 {
    ppg_global_set_default_event_processor(
-      (PPG_Event_Processor_Fun)kaleidoscope::PPG_Private::processEventCallback);
+      (PPG_Event_Processor_Fun)kaleidoscope::papageno::processEventCallback);
 
    ppg_global_set_signal_callback(
       (PPG_Signal_Callback) {
-            .func = (PPG_Signal_Callback_Fun)kaleidoscope::PPG_Private::signalCallback,
+            .func = (PPG_Signal_Callback_Fun)kaleidoscope::papageno::signalCallback,
             .user_data = NULL
       }
    );
@@ -273,11 +270,11 @@ void
    ppg_global_set_time_manager(
       (PPG_Time_Manager) {
          .time
-            = (PPG_Time_Fun)kaleidoscope::PPG_Private::time,
+            = (PPG_Time_Fun)kaleidoscope::papageno::time,
          .time_difference
-            = (PPG_Time_Difference_Fun)kaleidoscope::PPG_Private::timeDifference,
+            = (PPG_Time_Difference_Fun)kaleidoscope::papageno::timeDifference,
          .compare_times
-            = (PPG_Time_Comparison_Fun)kaleidoscope::PPG_Private::timeComparison
+            = (PPG_Time_Comparison_Fun)kaleidoscope::papageno::timeComparison
       }
    );
 }
@@ -290,11 +287,12 @@ void
       = (Key){ .raw 
             = reinterpret_cast<uint16_t>(user_data)};
       
-   uint8_t keyState = kaleidoscope::PPG_Private::getKeystate(activation);
+   uint8_t keyState = kaleidoscope::papageno::getKeystate(activation);
    
    // Note: Setting ROWS, COLS will skip keymap lookup
    //
    handleKeyswitchEvent(keycode, ROWS, COLS, keyState);
 }
 
+} // end namespace papageno
 } // end namepace kaleidoscope
