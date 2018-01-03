@@ -160,7 +160,6 @@ static void signalCallback(PPG_Signal_Id signal_id, void *user_data)
    #endif
 } 
 
-
 static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
 {   
    #define PPG_KLS_INPUT_CHECK_A \
