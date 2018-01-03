@@ -19,6 +19,8 @@
 #include <Kaleidoscope-Papageno.h>
 #include <kaleidoscope/hid.h>
 
+#include <iostream>
+
 __attribute__((weak)) 
 void papageno_setup();
 
@@ -30,10 +32,12 @@ namespace papageno {
 static PPG_Event flushQueue_[30];
 static uint8_t flushQueueEnd_;
 
+static bool eventHandlerDisabled = false;
+
 inline
 static uint8_t getKeystate(bool pressed)
 {
-   return ((pressed) ? IS_PRESSED : 0) | INJECTED;
+   return ((pressed) ? IS_PRESSED : 0)/* | INJECTED*/;
 }
 
 static void flushEvent(PPG_Event *event)
@@ -49,6 +53,8 @@ static void flushEvent(PPG_Event *event)
    //       
    //       Input ids assigned to keycode-inputs are {PPG_Highest_Keypos_Input + 1..PPG_Highest_Keycode_Input}
 
+   eventHandlerDisabled = true;
+   
    if(event->input > highest_keypos) {
       
       // Map the input to a range starting from zero to be suitable
@@ -56,6 +62,8 @@ static void flushEvent(PPG_Event *event)
       //
       Key keycode = ppg_kls_keycode_lookup[event->input - highest_keypos - 1];
       
+      PPG_LOG("flushing event by keycode %hu\n", keycode);
+              
       // Note: Setting ROWS, COLS will skip keymap lookup
       //
 //       handleKeyswitchEvent((Key_){ .raw = keycode}, ROWS, COLS, keyState);
@@ -63,11 +71,24 @@ static void flushEvent(PPG_Event *event)
    }
    else {
       
+      PPG_LOG("flushing event by keypos (%hhu, %hhu), keystate = %d\n",
+              ppg_kls_keypos_lookup[event->input].row,
+              ppg_kls_keypos_lookup[event->input].col,
+              (int)keyState
+             );
+      
       handleKeyswitchEvent(Key_NoKey, 
                            ppg_kls_keypos_lookup[event->input].row,
                            ppg_kls_keypos_lookup[event->input].col,
                            keyState);
    }
+
+   eventHandlerDisabled = false;
+   
+   // We must be sure to send press and release events
+   // in separate keyboard reports.
+   //
+   kaleidoscope::hid::sendKeyboardReport();
 }
 
 static void processEventCallback(   
@@ -161,11 +182,27 @@ static void signalCallback(PPG_Signal_Id signal_id, void *user_data)
 } 
 
 static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
-{   
+{  
+   // When flushing events, this event handler must 
+   // be disable as the events are meant to be handled 
+   // by the rest of Kaleidoscope.
+   //
+   if(eventHandlerDisabled) {
+      return keycode;
+   }
+   
+   PPG_Count flags = PPG_Event_Flags_Empty;
+   bool keyStateChanged = true;
+   if (keyToggledOn(key_state)) {
+      flags = PPG_Event_Active;
+   }
+   else if(!keyToggledOff(key_state)) {
+      // It the key remains pressed, we just ignore it
+      keyStateChanged = false;
+   }
+   
    #define PPG_KLS_INPUT_CHECK_A \
-  inputIdFromKeypos( \
-                       row, \
-                       col)
+         inputIdFromKeypos(row, col)
 
    #define PPG_KLS_INPUT_CHECK_B \
          inputIdFromKeycode(keycode)
@@ -193,12 +230,17 @@ static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
       
       if(input == PPG_KLS_Not_An_Input) { 
          
-         PPG_LOG("not an input\n");
-
-         // Whenever a key occurs that is not an input,
-         // we immediately abort pattern matching
+//          PPG_LOG("not an input\n");
+         
+         // Only if another (unrelated) key was pressed we abort.
          //
-         ppg_global_abort_pattern_matching();
+         if(flags == PPG_Event_Active) {
+
+            // Whenever a key occurs that is not an input,
+            // we immediately abort pattern matching
+            //
+            ppg_global_abort_pattern_matching();
+         }
          
          // Let Kaleidoscope process the key in a regular way
          //
@@ -212,12 +254,22 @@ static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
 //    uprintf("input %u, row %u, col %u\n", input, record->event.key.row, 
 //                         record->event.key.col);
 //   }
+
+   if(!keyStateChanged) {
+      
+      // Just ignore keys that are active but whose state does not change
+      //
+      return Key_NoKey;
+   }
  
+   std::cout << "eventHandlerHook: keycode.raw = " << (int)keycode.raw 
+      << ", row = " << (int)row << ", col = " << (int)col 
+      << ", key_state = " << (int)key_state << std::endl;
+      
    PPG_Event p_event = {
       .input = input,
       .time = (PPG_Time)millis(),
-      .flags = (key_state & IS_PRESSED)
-                  ? PPG_Event_Active : PPG_Event_Flags_Empty
+      .flags = flags
    };
    
    uint8_t cur_layer = Layer.top();
@@ -233,6 +285,7 @@ static void loopHook(bool is_post_clear)
 {
    if(!is_post_clear) {
       delayedFlushEvents();
+      std::cout << "Timeout check" << std::endl;
       ppg_timeout_check();
    }
 }

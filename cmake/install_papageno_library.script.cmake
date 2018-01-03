@@ -17,6 +17,14 @@
 
 set(papageno_library_directory "${CMAKE_SOURCE_DIR}/../papageno")
 
+if(NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
+   set(CMAKE_TOOLCHAIN_FILE_SPEC "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+endif()
+
+if(NOT "${PAPAGENO_PLATFORM}" STREQUAL "")
+   set(PAPAGENO_PLATFORM_SPEC "-DPAPAGENO_PLATFORM=${PAPAGENO_PLATFORM}")
+endif()
+
 if(NOT EXISTS "${papageno_library_directory}")
    
    file(MAKE_DIRECTORY "${papageno_library_directory}")
@@ -26,8 +34,8 @@ if(NOT EXISTS "${papageno_library_directory}")
    execute_process(
       COMMAND "${CMAKE_COMMAND}" 
          "-DPAPAGENO_ARDUINO_BUILD_DIR=${papageno_library_directory}"
-         "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/3rd_party/Papageno/cmake/toolchains/Toolchain-avr-gcc.cmake"
-         "-DPAPAGENO_PLATFORM=atmega32u4"
+         "${CMAKE_TOOLCHAIN_FILE_SPEC}"
+         "${PAPAGENO_PLATFORM_SPEC}"
          "${CMAKE_SOURCE_DIR}/3rd_party/Papageno"
       WORKING_DIRECTORY "${papageno_library_directory}"
    )

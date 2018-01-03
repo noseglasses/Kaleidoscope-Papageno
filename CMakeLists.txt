@@ -21,6 +21,8 @@ cmake_minimum_required(VERSION 2.8)
 #
 execute_process(
    COMMAND "${CMAKE_COMMAND}" 
-      "-DCMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}" 
+      "-DCMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
+      "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/3rd_party/Papageno/cmake/toolchains/Toolchain-avr-gcc.cmake"
+      "-DPAPAGENO_PLATFORM=atmega32u4"
       -P "${CMAKE_SOURCE_DIR}/cmake/install_papageno_library.script.cmake"
 )

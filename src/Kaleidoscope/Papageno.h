@@ -158,8 +158,8 @@ __NN__                                                                         \
 __NN__   ppg_global_compile();                                                 \
 __NL__   PPG_KLS_COMPRESSION_RUN
 
-#define PPG_KLS_KEYPOS_HEX(COL_HEX, ROW_HEX, S___)                             \
-   S___(COL_HEX, ROW_HEX)
+#define PPG_KLS_KEYPOS_HEX(ROW_HEX, COL_HEX, S___)                             \
+   S___(ROW_HEX, COL_HEX)
 
 #define PPG_KLS_ACTION_KEYCODE(KK)                                             \
 __NL__   (PPG_Action) {                                                        \
@@ -185,7 +185,7 @@ __NL__   PPG_KLS_INIT_COMPRESSION
 #define PPG_KLS_KEYPOS_ENUM(KEYPOS_NAME)                                       \
    PPG_KLS_TRICAT(PPG_, KEYPOS_NAME, _Keypos_Name)
 
-#define PPG_KLS_CONVERT_KEYPOS_TO_CASE_LABEL(COL_HEX, ROW_HEX)                 \
+#define PPG_KLS_CONVERT_KEYPOS_TO_CASE_LABEL(ROW_HEX, COL_HEX)                 \
    256*0x##ROW_HEX + 0x##COL_HEX
 
 #define PPG_KLS_DEFINE_KEYPOS_ENUM(KEYPOS_NAME)                                \
@@ -227,7 +227,7 @@ __NL__    */                                                                   \
 __NL__   enum { PPG_Highest_Keycode_Input = PPG_Highest_Keypos_Input           \
 __NL__                    - __COUNTER__ - PPG_Keypos_Input_Offset - 1 };
 
-#define PPG_KLS_CONVERT_KEYPOS_TO_CASE_LABEL(COL_HEX, ROW_HEX)                 \
+#define PPG_KLS_CONVERT_KEYPOS_TO_CASE_LABEL(ROW_HEX, COL_HEX)                 \
    256*0x##ROW_HEX + 0x##COL_HEX
 
 #define PPG_KLS_KEYPOS_CASE_LABEL(KEYPOS_ALIAS)                                \
@@ -266,11 +266,11 @@ __NL__                                                                         \
 __NL__      return PPG_KLS_Not_An_Input;                                       \
 __NL__   }
   
-#define PPG_KLS_CONVERT_TO_KEYPOS_ARRAY_ENTRY_AUX(COL_HEX, ROW_HEX)            \
+#define PPG_KLS_CONVERT_TO_KEYPOS_ARRAY_ENTRY_AUX(ROW_HEX, COL_HEX)            \
    { .row = 0x##ROW_HEX, .col = 0x##COL_HEX }
    
-#define PPG_KLS_CONVERT_TO_KEYPOS_ARRAY_ENTRY(COL_HEX, ROW_HEX)                \
-   PPG_KLS_CONVERT_TO_KEYPOS_ARRAY_ENTRY_AUX(COL_HEX, ROW_HEX),
+#define PPG_KLS_CONVERT_TO_KEYPOS_ARRAY_ENTRY(ROW_HEX, COL_HEX)                \
+   PPG_KLS_CONVERT_TO_KEYPOS_ARRAY_ENTRY_AUX(ROW_HEX, COL_HEX),
    
 #define PPG_KLS_KEYPOS_TO_LOOKUP_ENTRY(KEYPOS_ALIAS)                           \
    KEYPOS_ALIAS(PPG_KLS_CONVERT_TO_KEYPOS_ARRAY_ENTRY)
@@ -299,7 +299,7 @@ __NL__      PPG_KLS_CONVERT_TO_KEYCODE_ARRAY_ENTRY_AUX(                        \
 __NL__                    (Key){ .raw = (uint16_t)-1})                         \
 __NL__   };
    
-#define PPG_KLS_INPUT_FROM_KEYPOS_CALL(COL_HEX, ROW_HEX)                       \
+#define PPG_KLS_INPUT_FROM_KEYPOS_CALL(ROW_HEX, COL_HEX)                       \
    inputIdFromKeypos(0x##ROW_HEX, 0x##COL_HEX)
    
 #define PPG_KLS_INPUT_FROM_KEYPOS_ALIAS(KEYPOS_ALIAS)                          \
