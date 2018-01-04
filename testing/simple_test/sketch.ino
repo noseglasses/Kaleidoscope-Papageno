@@ -301,8 +301,9 @@ void setup() {
   // added in the order they're listed here.
   Kaleidoscope.use(
 
-    &Papageno,
-    
+    &Papageno
+   
+#if 0
     // The boot greeting effect pulses the LED button for 10 seconds after the keyboard is first connected
     &BootGreetingEffect,
 
@@ -353,6 +354,8 @@ void setup() {
     // The HostPowerManagement plugin enables waking up the host from suspend,
     // and allows us to turn LEDs off when it goes to sleep.
 //     &HostPowerManagement
+
+#endif
   );
 
   // While we hope to improve this in the future, the NumPad plugin

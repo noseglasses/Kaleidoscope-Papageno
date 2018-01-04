@@ -19,7 +19,7 @@
 #include <Kaleidoscope-Papageno.h>
 #include <kaleidoscope/hid.h>
 
-#include <iostream>
+// #include <iostream>
 
 __attribute__((weak)) 
 void papageno_setup();
@@ -37,7 +37,7 @@ static bool eventHandlerDisabled = false;
 inline
 static uint8_t getKeystate(bool pressed)
 {
-   return ((pressed) ? IS_PRESSED : 0)/* | INJECTED*/;
+   return ((pressed) ? (IS_PRESSED | INJECTED) : (WAS_PRESSED | INJECTED))/* | INJECTED*/;
 }
 
 static void flushEvent(PPG_Event *event)
@@ -91,6 +91,8 @@ static void flushEvent(PPG_Event *event)
    kaleidoscope::hid::sendKeyboardReport();
 }
 
+static void delayedFlushEvents();
+
 static void processEventCallback(   
                               PPG_Event *event,
                               void *user_data)
@@ -105,6 +107,8 @@ static void processEventCallback(
    papageno::flushQueue_[papageno::flushQueueEnd_] = *event;
    
    ++papageno::flushQueueEnd_;
+   
+   delayedFlushEvents();
 }
 
 static void flushEvents()
@@ -262,9 +266,9 @@ static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
       return Key_NoKey;
    }
  
-   std::cout << "eventHandlerHook: keycode.raw = " << (int)keycode.raw 
-      << ", row = " << (int)row << ", col = " << (int)col 
-      << ", key_state = " << (int)key_state << std::endl;
+//    std::cout << "eventHandlerHook: keycode.raw = " << (int)keycode.raw 
+//       << ", row = " << (int)row << ", col = " << (int)col 
+//       << ", key_state = " << (int)key_state << std::endl;
       
    PPG_Event p_event = {
       .input = input,
@@ -285,7 +289,7 @@ static void loopHook(bool is_post_clear)
 {
    if(!is_post_clear) {
       delayedFlushEvents();
-      std::cout << "Timeout check" << std::endl;
+//       std::cout << "Timeout check" << std::endl;
       ppg_timeout_check();
    }
 }
@@ -343,7 +347,9 @@ void
    
    // Note: Setting ROWS, COLS will skip keymap lookup
    //
+   eventHandlerDisabled = true;
    handleKeyswitchEvent(keycode, ROWS, COLS, keyState);
+   eventHandlerDisabled = false;
 }
 
 } // end namespace papageno

@@ -32,23 +32,45 @@ class PapagenoTest(Test):
 
    def run(self):
       
-      k1 = (3, 7)
-      k2 = (3, 8)
+      self.description(
+"This test checks the correct behavior of Papageno's two key tapping.\n"
+"\n"
+"Two keys, the innermost thumb keys, trigger the Enter key when hit short \n"
+"after another.\n"
+"\n"
+"This must work if the second key is hit while the first key is still \n"
+"active (overlapping). \n"
+"It also must work when the first key has already been released (sequencially).\n"
+"Also after a timeout the keys must be output as if they were not affected\n"
+"by Papageno (timeout).\n"
+"Finally, when another unrelated key is pressed in between, pattern\n"
+"recognition must be aborted and the tokens that have been queued so far must\n"
+"be output, followed by the key that has triggered the interruption.\n"
+"\n"
+      )
+      
+      k1 = (3, 7) # Assigned to left shift through the keymap
+      k2 = (3, 8) # Assigned to right shift through the keymap
+      
+      self.altKey = (0, 1) # Assigned to Key_1 through the keymap
             
       self.addPermanentReportAssertions([ 
          DumpReport()
       ])
             
-      #self.testTwoKeyTappingOverlapping([k1, k2])
-      #self.testTwoKeyTappingOverlapping([k2, k1])
+      self.testOvelapping([k1, k2])
+      self.testOvelapping([k2, k1])
       
-      #self.testTwoKeyTappingSequencially([k1, k2])
-      #self.testTwoKeyTappingSequencially([k2, k1])
+      self.testSequencially([k1, k2])
+      self.testSequencially([k2, k1])
       
-      #self.testTwoKeyTappingTimeout([k1, k2])
-      self.testTwoKeyTappingTimeout([k2, k1])
+      self.testTimeout([k1, k2])
+      self.testTimeout([k2, k1])
       
-   def testTwoKeyTappingOverlapping(self, keys):
+      self.testInterruption(k1)
+      self.testInterruption(k2)
+      
+   def testOvelapping(self, keys):
       
       self.header("Checking Papageno overlapping two key tap")
       
@@ -89,7 +111,7 @@ class PapagenoTest(Test):
       #
       self.scanCycles(2, cycleAssertionList = [CycleHasNReports(0)])
       
-   def testTwoKeyTappingSequencially(self, keys):
+   def testSequencially(self, keys):
       
       self.header("Checking Papageno sequencial two key tap")
       
@@ -127,7 +149,7 @@ class PapagenoTest(Test):
       #
       self.scanCycles(2, cycleAssertionList = [CycleHasNReports(0)])
       
-   def testTwoKeyTappingTimeout(self, keys):
+   def testTimeout(self, keys):
       
       self.header("Checking Papageno two key tap timeout")
 
@@ -149,7 +171,11 @@ class PapagenoTest(Test):
       
       # Wait for more than 200 millis
       #
-      self.skipTime(400)
+      self.skipTime(400, 
+                    [NReportsGenerated(2)] # Make sure that there are 
+                           # only two report generated for activating 
+                           # and deactivating the flushed key on timeout
+                   )
 
       self.keyDown(*keys[1])
       self.scanCycle([CycleHasNReports(0)])
@@ -165,7 +191,41 @@ class PapagenoTest(Test):
             
       # Wait for more than 200 millis
       #
-      self.skipTime(400)
+      self.skipTime(400, 
+                    [NReportsGenerated(2)] # Make sure that there are 
+                           # only two report generated for activating 
+                           # and deactivating the flushed key on timeout
+                  )
+      
+   def testInterruption(self, key):
+      
+      self.header("Checking Papageno two key tap alternatie key interruption")
+
+      # The first key does not trigger any reports.
+      #
+      self.keyDown(*key)
+      self.scanCycle([CycleHasNReports(0)])
+
+      # Release the first key
+      #
+      self.keyUp(*key)
+      self.scanCycle([CycleHasNReports(0)])
+      
+      # The following assertions are associated with three consequtive
+      # keyboard reports.
+      #
+      self.queueReportAssertion(
+         ReportModifiersActive([kaleidoscope.Layer.lookupOnActiveLayer(*key)], exclusively = True)
+      )
+      self.queueReportAssertion(ReportEmpty())
+      self.queueReportAssertion(ReportKeyActive(kaleidoscope.Layer.lookupOnActiveLayer(*self.altKey)))
+      
+      self.keyDown(*self.altKey)
+      self.scanCycle([CycleHasNReports(3)])
+      
+      self.queueReportAssertion(ReportEmpty())
+      self.keyUp(*self.altKey)
+      self.scanCycle([CycleHasNReports(1)])
 
 def main():
     
