@@ -15,7 +15,7 @@ jobs:
          - cd $HOME
          - mkdir ktest
          - cd ktest
-         - $HOME/Kaleidoscope-Testing/travis/test_kaleidoscope_module.sh 'https://github.com/noseglasses/Kaleidoscope-Papageno.git'
+         - $HOME/Kaleidoscope-Testing/travis/test_kaleidoscope_module.sh
          
 notifications:
   email:
