@@ -50,4 +50,8 @@ if(NOT EXISTS "${papageno_library_directory}")
       COMMAND "${CMAKE_COMMAND}" --build "${papageno_library_directory}" --target arduino_symlinks
    )
    
+   if(NOT EXISTS "${papageno_library_directory}/src/papageno.h")
+      message(FATAL_ERROR "Failed setting up papageno")
+   endif()
+   
 endif()
