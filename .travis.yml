@@ -1,7 +1,5 @@
 dist: trusty
-sudo: false
-os:
- - linux
+sudo: required
   
 before_install:
    - git clone --recursive https://github.com/noseglasses/Kaleidoscope-Testing.git

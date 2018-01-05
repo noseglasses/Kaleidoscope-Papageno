@@ -1,6 +1,7 @@
 ![status][st:experimental] [![Build Status][travis:image]][travis:status]
 
-[travis:status]: https://travis-ci.org/noseglasses/Kaleidoscope_Papageno
+[travis:image]: https://travis-ci.org/noseglasses/Kaleidoscope-Papageno.svg?branch=master
+[travis:status]: https://travis-ci.org/noseglasses/Kaleidoscope-Papageno
 
 [st:stable]: https://img.shields.io/badge/stable-✔-black.svg?style=flat&colorA=44cc11&colorB=494e52
 [st:broken]: https://img.shields.io/badge/broken-X-black.svg?style=flat&colorA=e05d44&colorB=494e52
