@@ -16,4 +16,4 @@ include $(BOARD_HARDWARE_PATH)/$(KALEIDOSCOPE_PLUGIN_MAKEFILE_DIR)/rules.mk
 papageno:
 	cmake \
 	        -DMAKE_SOURCE_DIR=$PWD \
-	        -P "${PWD}/cmake/install_papageno_library.script.cmake"
+	        -P "${PWD}/setup_library.script.cmake"

@@ -1,47 +1,28 @@
 dist: trusty
 sudo: false
 os:
-  - linux
-install:
-  # install git repos
-  - cd $HOME
-  - git clone --depth 1 --recurse-submodules https://github.com/keyboardio/Arduino-Boards Arduino/hardware/keyboardio/avr
-  - git clone --depth 1 https://github.com/noseglasses/Model01-Firmware-Papageno-Test.git Arduino/Model01-Firmware
-  - git clone --depth 1 --recurse-submodules https://github.com/noseglasses/Kaleidoscope_Papageno.git Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno
-  # install Arduino
-  - mkdir -p $HOME/Downloads
-  - cd $HOME/Downloads
-  - wget https://downloads.arduino.cc/arduino-1.8.5-linux64.tar.xz
-  - tar -xvf arduino-1.8.5-linux64.tar.xz
-  - sudo mv arduino-1.8.5 /opt
-  - cd /opt/arduino-1.8.5
-  - chmod +x install.sh
-  - ./install.sh
-env:
-  - ARDUINO_PATH=/opt/arduino-1.8.5
-script:
-  # generate the Papageno arduino library
-  - cd $HOME/Arduino/hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno
-  - ls -l
-  - mkdir -p build/atmega32u4
-  - cd build/atmega32u4
-  - ls -l
-  - cmake -DPAPAGENO_PLATFORM=atmega32u4 ../..
-  - make arduino
-  # Generate a link to the generated Papageno arduino library that the
-  # Arduino build system can find
-  - mkdir -p $HOME/Arduino/libraries
-  - cd $HOME/Arduino/libraries
-  - ln -s ../hardware/keyboardio/avr/libraries/Kaleidoscope_Papageno/3rd_party/Papageno/build/atmega32u4/arduino Papageno
-  # Build kaleidoscope
-  - cd Papageno
-  - ls -l
-  - cd $HOME/Arduino/Model01-Firmware
-  - make VERBOSE=1
+ - linux
+  
+before_install:
+   - git clone --recursive https://github.com/noseglasses/Kaleidoscope-Testing.git
+   - Kaleidoscope-Testing/travis/before_install.sh
+
+script: skip
+    
+jobs:
+  include:
+    - stage: test
+      script:
+         - cd $HOME
+         - mkdir ktest
+         - cd ktest
+         - $HOME/Kaleidoscope-Testing/travis/test_kaleidoscope_module.sh 'https://github.com/noseglasses/Kaleidoscope-Papageno.git'
+         
 notifications:
   email:
     recipients:
       - shinynoseglasses@gmail.com
     on_failure: always
+    
 cache:
-  ccache: true
+ccache: true
