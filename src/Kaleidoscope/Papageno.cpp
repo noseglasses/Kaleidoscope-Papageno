@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*-
  * Kaleidoscope-Papageno -- Papageno features for Kaleidoscope
- * Copyright (C) 2017 Florian Fleissner
+ * Copyright (C) 2017 noseglasses <shinynoseglasses@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
