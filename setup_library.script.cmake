@@ -18,16 +18,22 @@
 set(papageno_library_directory "${CMAKE_SOURCE_DIR}/../papageno")
 
 if(NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
+   message("Using toolchain file \"${CMAKE_TOOLCHAIN_FILE}\"")
    set(CMAKE_TOOLCHAIN_FILE_SPEC "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
 elseif(NOT KALEIDOSCOPE_VIRTUAL_BUILD)
-   set(CMAKE_TOOLCHAIN_FILE_SPEC "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/3rd_party/Papageno/cmake/toolchains/Toolchain-avr-gcc.cmake")
+   set(toolchain_file "${CMAKE_SOURCE_DIR}/3rd_party/Papageno/cmake/toolchains/Toolchain-avr-gcc.cmake")
+   message("Using toolchain file \"${toolchain_file}\"")
+   set(CMAKE_TOOLCHAIN_FILE_SPEC "-DCMAKE_TOOLCHAIN_FILE=${toolchain_file}")
 endif()
 
 if(NOT "${PAPAGENO_PLATFORM}" STREQUAL "")
+   message("Building papageno for platform ${PAPAGENO_PLATFORM}")
    set(PAPAGENO_PLATFORM_SPEC "-DPAPAGENO_PLATFORM=${PAPAGENO_PLATFORM}")
 else(NOT KALEIDOSCOPE_VIRTUAL_BUILD)
+   message("Building papageno for platform atmega32u4")
    set(PAPAGENO_PLATFORM_SPEC "-DPAPAGENO_PLATFORM=atmega32u4")
 else()
+   message("Virtual build => Building papageno for platform generic")
    set(PAPAGENO_PLATFORM_SPEC "-DPAPAGENO_PLATFORM=generic")
 endif()
 
