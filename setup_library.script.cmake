@@ -19,14 +19,16 @@ set(papageno_library_directory "${CMAKE_SOURCE_DIR}/../papageno")
 
 if(NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
    set(CMAKE_TOOLCHAIN_FILE_SPEC "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
-else()
+elseif(NOT KALEIDOSCOPE_VIRTUAL_BUILD)
    set(CMAKE_TOOLCHAIN_FILE_SPEC "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/3rd_party/Papageno/cmake/toolchains/Toolchain-avr-gcc.cmake")
 endif()
 
 if(NOT "${PAPAGENO_PLATFORM}" STREQUAL "")
    set(PAPAGENO_PLATFORM_SPEC "-DPAPAGENO_PLATFORM=${PAPAGENO_PLATFORM}")
-else()
+else(NOT KALEIDOSCOPE_VIRTUAL_BUILD)
    set(PAPAGENO_PLATFORM_SPEC "-DPAPAGENO_PLATFORM=atmega32u4")
+else()
+   set(PAPAGENO_PLATFORM_SPEC "-DPAPAGENO_PLATFORM=generic")
 endif()
 
 if(NOT EXISTS "${papageno_library_directory}")
