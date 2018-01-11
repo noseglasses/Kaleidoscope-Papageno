@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 
 # -*- mode: c++ -*-
-# Kaleidoscope-Python -- Wraps Kaleidoscope modules' c++
-#    code to be available in Python programs.
+# Kaleidoscope-Papageno -- Papageno features for Kaleidoscope
 # Copyright (C) 2017 noseglasses <shinynoseglasses@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,11 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-# This is a python based implementation of the Kaleidoscope-Dual-Use plugin
-#
-# It demonstrates how plugins can be prototyped with Kaleidoscope-Python
-# before finally implementing them as C++ code.
 
 import kaleidoscope
 from kaleidoscope import *
