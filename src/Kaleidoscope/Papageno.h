@@ -514,3 +514,27 @@ __NL__   )
                         PPG_KLS_ACTION_GENERATOR_KEYCODE,                      \
                         __VA_ARGS__                                            \
    )
+
+//##############################################################################
+// Definitions for Papagenos glockenspiel compiler interface
+//##############################################################################
+//
+#define GLS_NO_AUTOMATIC_LOCAL_INITIALIZATION
+   
+#define GLS_ACTION_INITIALIZE__KEYCODE(ID, KEYCODE) \
+   PPG_KLS_ACTION_KEYCODE(KEYCODE)
+
+#define GLS_INPUT_INITIALIZE__KEYPOS(ID, ROW, COL) \
+   PPG_KLS_KEYPOS_ENUM(ID)
+   
+#define GLS_INPUT_INITIALIZE__KEYCODE(ID, KEYCODE) \
+   PPG_KLS_KEYCODE_ENUM(ID)
+   
+#define PPG_KLS_MATRIX_POSITION_INPUTS(OP) \
+   GLS_INPUTS___KEYPOS(OP)
+   
+#define PPG_KLS_KEYCODE_INPUTS(OP) \
+   GLS_INPUTS___KEYCODE(OP)
+   
+#define GLS_GLOBAL_INITIALIZATION \
+   PPG_KLS_INIT_DATA_STRUCTURES
