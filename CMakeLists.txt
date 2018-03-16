@@ -49,7 +49,7 @@ if("${GLOCKENSPIEL_EXECUTABLE}" STREQUAL "GLOCKENSPIEL_EXECUTABLE-NOTFOUND")
    message(FATAL_ERROR "Unable to find GLOCKENSPIEL_EXECUTABLE")
 endif()
 
-set(kaleidoscope_papageno_source "${sketch_path}/Kaleidoscope-Papageno-GLS.cpp")
+set(kaleidoscope_papageno_source "${sketch_path}/Kaleidoscope-Papageno.cpp")
 
 execute_process(
    COMMAND "${GLOCKENSPIEL_EXECUTABLE}" 
