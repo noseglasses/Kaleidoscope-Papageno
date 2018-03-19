@@ -16,13 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define KALEIDOSCOPE_PAPAGENO_POSTPONE_INITIALIZATION
 #include <Kaleidoscope-Papageno.h>
 #include <kaleidoscope/hid.h>
 
 // #include <iostream>
 
 __attribute__((weak)) 
-void papageno_setup();
+void papageno_initialize_context();
 
 kaleidoscope::papageno::Papageno Papageno;
 
@@ -298,9 +299,9 @@ void
    Papageno
       ::begin() 
 {
-   // Call the possibly overridden user initialization function
+   // Initialize the static global pattern matching tree
    //
-   papageno_setup();
+   papageno_initialize_context();
    
    Kaleidoscope.useEventHandlerHook(
          kaleidoscope::papageno::eventHandlerHook);
@@ -349,6 +350,21 @@ void
    //
    eventHandlerDisabled = true;
    handleKeyswitchEvent(keycode, ROWS, COLS, keyState);
+   eventHandlerDisabled = false;
+}
+
+void processKeypos(bool activation, void *user_data)
+{
+   uint16_t raw = (uint16_t)user_data;
+   uint8_t row = raw >> 8;
+   uint8_t col = raw & 0x00FF;
+         
+   uint8_t keyState = kaleidoscope::papageno::getKeystate(activation);
+   
+   // Note: Setting ROWS, COLS will skip keymap lookup
+   //
+   eventHandlerDisabled = true;
+   handleKeyswitchEvent(Key_NoKey, row, col, keyState);
    eventHandlerDisabled = false;
 }
 

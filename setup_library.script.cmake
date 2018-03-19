@@ -15,13 +15,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-set(papageno_library_directory "${CMAKE_SOURCE_DIR}/../papageno")
+set(module_source_dir "")
+
+if(NOT "${KALEIDOSCOPE_MODULE_SOURCE_DIR}" STREQUAL "")
+   set(module_source_dir "${KALEIDOSCOPE_MODULE_SOURCE_DIR}")
+else()
+   set(module_source_dir "${CMAKE_SOURCE_DIR}")
+endif()
+
+set(papageno_library_directory "${module_source_dir}/../papageno")
+
+# message("KALEIDOSCOPE_MODULE_SOURCE_DIR: ${KALEIDOSCOPE_MODULE_SOURCE_DIR}")
+# message("papageno_library_directory: ${papageno_library_directory}")
 
 if(NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
    message("Using toolchain file \"${CMAKE_TOOLCHAIN_FILE}\"")
    set(CMAKE_TOOLCHAIN_FILE_SPEC "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
 elseif(NOT KALEIDOSCOPE_VIRTUAL_BUILD)
-   set(toolchain_file "${CMAKE_SOURCE_DIR}/3rd_party/Papageno/cmake/toolchains/Toolchain-avr-gcc.cmake")
+   set(toolchain_file "${module_source_dir}/3rd_party/Papageno/cmake/toolchains/Toolchain-avr-gcc.cmake")
    message("Using toolchain file \"${toolchain_file}\"")
    set(CMAKE_TOOLCHAIN_FILE_SPEC "-DCMAKE_TOOLCHAIN_FILE=${toolchain_file}")
 endif()
@@ -48,7 +59,7 @@ if(NOT EXISTS "${papageno_library_directory}")
          "-DPAPAGENO_ARDUINO_BUILD_DIR=${papageno_library_directory}"
          "${CMAKE_TOOLCHAIN_FILE_SPEC}"
          "${PAPAGENO_PLATFORM_SPEC}"
-         "${CMAKE_SOURCE_DIR}/3rd_party/Papageno"
+         "${module_source_dir}/3rd_party/Papageno"
       WORKING_DIRECTORY "${papageno_library_directory}"
    )
    

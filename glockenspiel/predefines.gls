@@ -1,0 +1,12 @@
+glockenspiel_begin
+
+input type: KEYCODE
+input type: COMPLEX_KEYCODE
+input type: KEYPOS
+
+action type: KEYCODE
+action type: COMPLEX_KEYCODE
+action type: KEYPOS
+action type: USER_FUNCTION
+
+glockenspiel_end
