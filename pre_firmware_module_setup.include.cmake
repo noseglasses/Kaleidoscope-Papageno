@@ -79,6 +79,7 @@ message("KALEIDOSCOPE_FIRMWARE_SKETCH=${KALEIDOSCOPE_FIRMWARE_SKETCH}")
 add_custom_command(
    OUTPUT "${kaleidoscope_papageno_source}"
    DEPENDS "${KALEIDOSCOPE_FIRMWARE_SKETCH}"
+   DEPENDS "${glockenspiel_executable}"
    COMMAND "${glockenspiel_executable}" 
       -I "${sketch_path}" 
       -i "${KALEIDOSCOPE_MODULE_SOURCE_DIR}/glockenspiel/predefines.gls"

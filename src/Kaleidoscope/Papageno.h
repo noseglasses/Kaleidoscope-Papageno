@@ -26,14 +26,14 @@ extern "C" {
  #include "papageno.h"
 }
 
+namespace kaleidoscope {
+namespace papageno {
+   
 typedef struct {
    byte row;
    byte col;
 } PPG_KLS_Keypos;
 
-namespace kaleidoscope {
-namespace papageno {
-   
 class Papageno : public KaleidoscopePlugin
 {
    public:
@@ -53,11 +53,6 @@ class Papageno : public KaleidoscopePlugin
       static void loopHook(bool is_post_clear);
 };
 
-} // namespace papageno
-} // namespace kaleidoscope
-
-extern kaleidoscope::papageno::Papageno Papageno;
-
 enum { PPG_KLS_Not_An_Input = (PPG_Input_Id)-1 };
 
 // The following extern entities are initialized in Papageno-Initialization.h
@@ -69,6 +64,19 @@ extern PPG_Input_Id inputIdFromKeypos(byte row, byte col);
 extern PPG_Input_Id inputIdFromKeycode(Key keycode);
 
 extern int16_t highestKeyposInputId();
+
+extern void time(PPG_Time *time);
+
+extern void timeDifference(PPG_Time time1, PPG_Time time2, PPG_Time *delta);
+
+extern int8_t timeComparison(
+                        PPG_Time time1,
+                        PPG_Time time2);
+
+} // namespace papageno
+} // namespace kaleidoscope
+
+extern kaleidoscope::papageno::Papageno Papageno;
 
 #define PPG_KLS_TRICAT(S1, S2, S3) S1##S2##S3
 
@@ -82,62 +90,66 @@ extern int16_t highestKeyposInputId();
 // Definitions for Papageno's Glockenspiel compiler interface
 //##############################################################################
 
+#define GLS_ENABLE_INPUTS_LOCAL_INITIALIZATION___KEYPOS
+#define GLS_ENABLE_INPUTS_LOCAL_INITIALIZATION___KEYCODE
+#define GLS_ENABLE_INPUTS_LOCAL_INITIALIZATION___COMPLEX_KEYCODE
+
 // This macro is used by the Glockenspiel compiled code to initialize
 // keypos based inputs. It boils down to the name of a constexpr integer that
 // references the input.
 //
-#define GLS_INPUT_INITIALIZE__KEYPOS(ID, ROW, COL) \
-   PPG_KLS_KEYPOS_INPUT(ID)
+#define GLS_INPUT_INITIALIZE___KEYPOS(ID, ROW, COL) \
+   kaleidoscope::papageno::PPG_KLS_KEYPOS_INPUT(ID)
 
 // This macro is used by the Glockenspiel compiled code to initialize
 // keycode based inputs. It boils down to the name of a constexpr integer that
 // references the input.
 //  
-#define GLS_INPUT_INITIALIZE__KEYCODE(ID) \
-   PPG_KLS_KEYCODE_INPUT(ID)
+#define GLS_INPUT_INITIALIZE___KEYCODE(ID) \
+   kaleidoscope::papageno::PPG_KLS_KEYCODE_INPUT(ID)
 
 // This macro is used by the Glockenspiel compiled code to initialize
 // keycode based inputs. It boils down to the name of a constexpr integer that
 // references the input.
 //  
-#define GLS_INPUT_INITIALIZE__COMPLEX_KEYCODE(ID, KEYCODE) \
-   PPG_KLS_KEYCODE_INPUT(ID)
+#define GLS_INPUT_INITIALIZE___COMPLEX_KEYCODE(ID, KEYCODE) \
+   kaleidoscope::papageno::PPG_KLS_KEYCODE_INPUT(ID)
    
 // Keycode actions are compile time constant and can thus already
 // assigned when the global static Papageno search tree is initialized.
 //
-#define GLS_ACTION_INITIALIZE__KEYCODE(ID)                                     \
+#define GLS_ACTION_INITIALIZE___KEYCODE(...)                                   \
 __NL__   {                                                                     \
-__NL__      .callback =  {                                                     \
-__NL__         .func = (PPG_Action_Callback_Fun)                               \
+__NL__      __GLS_DI__(callback)  {                                                \
+__NL__         __GLS_DI__(func) (PPG_Action_Callback_Fun)                          \
 __NL__                    kaleidoscope::papageno::Papageno::processKeycode,    \
-__NL__         .user_data = reinterpret_cast<void*>((ID).raw)                  \
+__NL__         __GLS_DI__(user_data) reinterpret_cast<void*>((__VA_ARGS__).raw)    \
 __NL__      }                                                                  \
 __NL__   } 
 
-#define GLS_ACTION_INITIALIZE__COMPLEX_KEYCODE(ID, ...)                        \
+#define GLS_ACTION_INITIALIZE___COMPLEX_KEYCODE(ID, ...)                       \
 __NL__   {                                                                     \
-__NL__      .callback =  {                                                     \
-__NL__         .func = (PPG_Action_Callback_Fun)                               \
+__NL__      __GLS_DI__(callback)  {                                                \
+__NL__         __GLS_DI__(func) (PPG_Action_Callback_Fun)                          \
 __NL__                    kaleidoscope::papageno::Papageno::processKeycode,    \
-__NL__         .user_data = reinterpret_cast<void*>((__VA_ARGS__).raw)         \
+__NL__         __GLS_DI__(user_data) reinterpret_cast<void*>((__VA_ARGS__).raw)    \
 __NL__      }                                                                  \
 __NL__   } 
 
-#define GLS_ACTION_INITIALIZE__KEYPOS(ID, ROW, COL)                            \
+#define GLS_ACTION_INITIALIZE___KEYPOS(ID, ROW, COL)                           \
 __NL__   {                                                                     \
-__NL__      .callback =  {                                                     \
-__NL__         .func = (PPG_Action_Callback_Fun)                               \
+__NL__      __GLS_DI__(callback)  {                                                \
+__NL__         __GLS_DI__(func) (PPG_Action_Callback_Fun)                          \
 __NL__                    kaleidoscope::papageno::Papageno::processKeypos,     \
-__NL__         .user_data = (void*)(uint16_t((ROW) << 8 | (COL)))              \
+__NL__         __GLS_DI__(user_data) (void*)(uint16_t((ROW) << 8 | (COL)))         \
 __NL__      }                                                                  \
 __NL__   } 
    
-#define GLS_ACTION_INITIALIZE__USER_FUNCTION(ID, FUNC, USER_DATA)              \
+#define GLS_ACTION_INITIALIZE___USER_FUNCTION(ID, FUNC, USER_DATA)             \
 __NL__   {                                                                     \
-__NL__      .callback =  {                                                     \
-__NL__         .func = (PPG_Action_Callback_Fun)FUNC,                          \
-__NL__         .user_data = USER_DATA                                          \
+__NL__      __GLS_DI__(callback)  {                                                \
+__NL__         __GLS_DI__(func) (PPG_Action_Callback_Fun)FUNC,                     \
+__NL__         __GLS_DI__(user_data) USER_DATA                                     \
 __NL__      }                                                                  \
 __NL__   } 
 // A file that is included in the Glockenspiel-generated
@@ -216,5 +228,7 @@ glockenspiel_end
 // before this header is included.
 //
 #ifndef KALEIDOSCOPE_PAPAGENO_POSTPONE_INITIALIZATION
+extern "C" {
 #include "Kaleidoscope-Papageno-Sketch.hpp"
+}
 #endif

@@ -18,6 +18,8 @@
 
 #pragma once
 
+} // This ends region extern "C"
+
 // A note on the use of the __NL__ macro below:
 //
 //       Preprocessor macro functions can be 
@@ -45,6 +47,9 @@
 #define __NL__
 #define __NN__
 
+namespace kaleidoscope {
+namespace papageno {
+   
 // #define PPG_KLS_KEYPOS(ROW, COL, S___)                             
 //    S___(ROW, COL)
 //
@@ -81,6 +86,8 @@ GLS_INPUTS___KEYPOS(PPG_KLS_DEFINE_KEYPOS_INPUT_ID)
 //
 static constexpr int16_t PPG_Highest_Keypos_Input
            = (int16_t)(__COUNTER__) - PPG_Keypos_Input_Offset - 2 ;
+           
+static_assert(PPG_Highest_Keypos_Input >= 0, "PPG_Highest_Keypos_Input negative");
 
 int16_t highestKeyposInputId() {
    return PPG_Highest_Keypos_Input;
@@ -90,7 +97,7 @@ static constexpr unsigned PPG_Keycode_Input_Offset = __COUNTER__;
 
 #define PPG_KLS_DEFINE_KEYCODE_INPUT_ID(ID)                                    \
 __NL__   static constexpr unsigned PPG_KLS_KEYCODE_INPUT(ID)                   \
-__NL__      = PPG_Highest_Keypos_Input + __COUNTER__ - PPG_Keycode_Input_Offset;
+__NL__      = PPG_Highest_Keypos_Input + (int16_t)(__COUNTER__) - PPG_Keycode_Input_Offset;
 
 GLS_INPUTS___KEYCODE(PPG_KLS_DEFINE_KEYCODE_INPUT_ID)
 
@@ -104,7 +111,7 @@ GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_DEFINE_COMPLEX_KEYCODE_INPUT_ID)
  */
 static constexpr unsigned PPG_Highest_Keycode_Input 
    = PPG_Highest_Keypos_Input
-                 - __COUNTER__ - PPG_Keypos_Input_Offset - 1;
+                 + (int16_t)(__COUNTER__) - PPG_Keypos_Input_Offset - 1;
 
 static_assert(PPG_Highest_Keycode_Input <= 255,
    "The number of inputs exceeds the maximum possible number of 255");
@@ -155,11 +162,11 @@ __NL__      break;
 PPG_KLS_Keypos ppg_kls_keypos_lookup[] = {
 
 #  define PPG_KLS_KEYPOS_TO_LOOKUP_ENTRY(ID, ROW, COL)                         \
-      { .row = ROW, .col = COL }
+      { .row = ROW, .col = COL },
       
    GLS_INPUTS___KEYPOS(PPG_KLS_KEYPOS_TO_LOOKUP_ENTRY)
 
-   PPG_KLS_CONVERT_TO_KEYPOS_ARRAY_ENTRY_AUX(FF, FF)
+   { .row = 0xFF, .col = 0xFFL }
 };
 
 Key ppg_kls_keycode_lookup[] = {
@@ -182,3 +189,8 @@ static constexpr unsigned PPG_KLS_N_Inputs = 0
    GLS_INPUTS___KEYCODE(PPG_KLS_ADD_ONE)
    GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_ADD_ONE)
 ;
+
+} // namespace papageno
+} // namespace kaleidoscope
+
+extern "C" {

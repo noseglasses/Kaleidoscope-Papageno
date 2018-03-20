@@ -22,6 +22,12 @@
 
 // #include <iostream>
 
+// extern "C" {
+// 
+//    #include "detail/ppg_context_detail.h"
+//    PPG_Context *ppg_context;
+// }
+
 __attribute__((weak)) 
 void papageno_initialize_context();
 
@@ -96,7 +102,7 @@ static void delayedFlushEvents();
 
 static void processEventCallback(   
                               PPG_Event *event,
-                              void *user_data)
+                              void *)
 {
    // Ignore events that were considered, i.e. swallowed by Papageno
    //
@@ -135,20 +141,20 @@ static void delayedFlushEvents()
    }
 }
 
-static void time(PPG_Time *time)
+void time(PPG_Time *time)
 {
    uint16_t time_tmp = millis();
    *time = *((PPG_Time*)&time_tmp);
 }
 
-static void timeDifference(PPG_Time time1, PPG_Time time2, PPG_Time *delta)
+void timeDifference(PPG_Time time1, PPG_Time time2, PPG_Time *delta)
 {
    uint16_t *delta_t = (uint16_t *)delta;
    
    *delta_t = (uint16_t)time2 - (uint16_t)time1; 
 }
 
-static int8_t timeComparison(
+int8_t timeComparison(
                         PPG_Time time1,
                         PPG_Time time2)
 {
@@ -162,7 +168,7 @@ static int8_t timeComparison(
    return -1;
 }
 
-static void signalCallback(PPG_Signal_Id signal_id, void *user_data)
+static void signalCallback(PPG_Signal_Id signal_id, void *)
 {
 //    uprintf("signal %u\n", signal_id  );
    
