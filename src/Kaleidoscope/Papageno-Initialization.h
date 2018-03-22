@@ -60,7 +60,7 @@ namespace papageno {
 //    PPG_KLS_KEYPOS_INPUT(KEYPOS_ALIAS)
 //    
 // #define PPG_KLS_INPUT_FROM_ID(ID)                      
-//    PPG_KLS_KEYCODE_INPUT(ID)
+//    PPG_##ID##_Keycode_Name
 
 // The inputs that are defined by Papageno in the firmware sketch
 // are mapped to a range of compile time constants whose value starts from 
@@ -75,8 +75,8 @@ namespace papageno {
 //
 static constexpr unsigned PPG_Keypos_Input_Offset = __COUNTER__;
 
-#define PPG_KLS_DEFINE_KEYPOS_INPUT_ID(ID, ROW, COL)                           \
-__NL__   static constexpr unsigned PPG_KLS_KEYPOS_INPUT(ID)                    \
+#define PPG_KLS_DEFINE_KEYPOS_INPUT_ID(UNIQUE_ID, USER_ID, ROW, COL)                           \
+__NL__   static constexpr unsigned PPG_KLS_KEYPOS_INPUT(UNIQUE_ID)                    \
 __NL__               = __COUNTER__ - PPG_Keypos_Input_Offset - 1;
 
 GLS_INPUTS___KEYPOS(PPG_KLS_DEFINE_KEYPOS_INPUT_ID)
@@ -95,14 +95,14 @@ int16_t highestKeyposInputId() {
 
 static constexpr unsigned PPG_Keycode_Input_Offset = __COUNTER__;
 
-#define PPG_KLS_DEFINE_KEYCODE_INPUT_ID(ID)                                    \
-__NL__   static constexpr unsigned PPG_KLS_KEYCODE_INPUT(ID)                   \
+#define PPG_KLS_DEFINE_KEYCODE_INPUT_ID(UNIQUE_ID, USER_ID)                                    \
+__NL__   static constexpr unsigned PPG_KLS_KEYCODE_INPUT(UNIQUE_ID)                   \
 __NL__      = PPG_Highest_Keypos_Input + (int16_t)(__COUNTER__) - PPG_Keycode_Input_Offset;
 
 GLS_INPUTS___KEYCODE(PPG_KLS_DEFINE_KEYCODE_INPUT_ID)
 
-#define PPG_KLS_DEFINE_COMPLEX_KEYCODE_INPUT_ID(ID, KEYCODE)                   \
-            PPG_KLS_DEFINE_KEYCODE_INPUT_ID(ID)
+#define PPG_KLS_DEFINE_COMPLEX_KEYCODE_INPUT_ID(UNIQUE_ID, USER_ID, KEYCODE)                   \
+            PPG_KLS_DEFINE_KEYCODE_INPUT_ID(UNIQUE_ID, 0 /*unused*/)
 
 GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_DEFINE_COMPLEX_KEYCODE_INPUT_ID)
 
@@ -125,9 +125,9 @@ PPG_Input_Id inputIdFromKeypos(byte row, byte col)
 
    switch(id) {
    
-#     define PPG_KLS_KEYPOS_CASE_LABEL(ID, ROW, COL)                           \
+#     define PPG_KLS_KEYPOS_CASE_LABEL(UNIQUE_ID, USER_ID, ROW, COL)                           \
 __NL__   case 256*ROW + COL:                                                   \
-__NL__      return PPG_KLS_KEYPOS_INPUT(ID);                                   \
+__NL__      return PPG_KLS_KEYPOS_INPUT(UNIQUE_ID);                                   \
 __NL__      break;
 
       GLS_INPUTS___KEYPOS(PPG_KLS_KEYPOS_CASE_LABEL)
@@ -143,15 +143,15 @@ PPG_Input_Id inputIdFromKeycode(Key keycode)
 {
    switch(keycode.raw) {
 
-#     define PPG_KLS_KEYCODE_CASE_LABEL(ID)                                    \
-__NL__   case (ID):                                                            \
-__NL__      return PPG_KLS_KEYCODE_INPUT(ID);                                  \
+#     define PPG_KLS_KEYCODE_CASE_LABEL(UNIQUE_ID, USER_ID)                                    \
+__NL__   case USER_ID.flags << 8 | USER_ID.keyCode:                                                         \
+__NL__      return PPG_KLS_KEYCODE_INPUT(UNIQUE_ID);                                  \
 __NL__      break;
 
       GLS_INPUTS___KEYCODE(PPG_KLS_KEYCODE_CASE_LABEL)
       
-#     define PPG_KLS_COMPLEX_KEYCODE_CASE_LABEL(ID, KEYCODE)                   \
-         PPG_KLS_KEYCODE_CASE_LABEL(ID)
+#     define PPG_KLS_COMPLEX_KEYCODE_CASE_LABEL(UNIQUE_ID, USER_ID, KEYCODE)                   \
+         PPG_KLS_KEYCODE_CASE_LABEL(UNIQUE_ID, GLS_DEFER(USER_ID))
          
       GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_COMPLEX_KEYCODE_CASE_LABEL)
    }
@@ -161,7 +161,7 @@ __NL__      break;
 
 PPG_KLS_Keypos ppg_kls_keypos_lookup[] = {
 
-#  define PPG_KLS_KEYPOS_TO_LOOKUP_ENTRY(ID, ROW, COL)                         \
+#  define PPG_KLS_KEYPOS_TO_LOOKUP_ENTRY(UNIQUE_ID, USER_ID, ROW, COL)                         \
       { .row = ROW, .col = COL },
       
    GLS_INPUTS___KEYPOS(PPG_KLS_KEYPOS_TO_LOOKUP_ENTRY)
@@ -171,11 +171,11 @@ PPG_KLS_Keypos ppg_kls_keypos_lookup[] = {
 
 Key ppg_kls_keycode_lookup[] = {
 
-#  define PPG_KLS_CONVERT_TO_KEYCODE_ARRAY_ENTRY(KEYCODE) KEYCODE,
+#  define PPG_KLS_CONVERT_TO_KEYCODE_ARRAY_ENTRY(UNIQUE_ID, USER_ID) USER_ID /* USER_ID is actually a keycode*/,
       
    GLS_INPUTS___KEYCODE(PPG_KLS_CONVERT_TO_KEYCODE_ARRAY_ENTRY)
 
-#  define PPG_KLS_CONVERT_COMPLEX_TO_KEYCODE_ARRAY_ENTRY(ID, KEYCODE) KEYCODE,
+#  define PPG_KLS_CONVERT_COMPLEX_TO_KEYCODE_ARRAY_ENTRY(UNIQUE_ID, USER_ID, KEYCODE) KEYCODE,
       
    GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_CONVERT_COMPLEX_TO_KEYCODE_ARRAY_ENTRY)
 

@@ -77,14 +77,15 @@ extern int8_t timeComparison(
 } // namespace kaleidoscope
 
 extern kaleidoscope::papageno::Papageno Papageno;
+#define PPG_KLS_PREVENT_EXPANSION(S, ...) S##__VA_ARGS__
 
 #define PPG_KLS_TRICAT(S1, S2, S3) S1##S2##S3
 
-#define PPG_KLS_KEYPOS_INPUT(ID)                                               \
-   PPG_KLS_TRICAT(PPG_, ID, _Keypos_Name)
-   
-#define PPG_KLS_KEYCODE_INPUT(ID)                                              \
-   PPG_##ID##_Keycode_Name
+#define PPG_KLS_KEYPOS_INPUT(UNIQUE_ID)                                               \
+   PPG_KLS_TRICAT(PPG_, UNIQUE_ID, _Keypos_Name)
+
+#define PPG_KLS_KEYCODE_INPUT(UNIQUE_ID)                                               \
+   PPG_KLS_TRICAT(PPG_, UNIQUE_ID, _Keycode_Name)
 
 //##############################################################################
 // Definitions for Papageno's Glockenspiel compiler interface
@@ -98,22 +99,22 @@ extern kaleidoscope::papageno::Papageno Papageno;
 // keypos based inputs. It boils down to the name of a constexpr integer that
 // references the input.
 //
-#define GLS_INPUT_INITIALIZE___KEYPOS(ID, ROW, COL) \
-   kaleidoscope::papageno::PPG_KLS_KEYPOS_INPUT(ID)
+#define GLS_INPUT_INITIALIZE___KEYPOS(UNIQUE_ID, USER_ID, ROW, COL) \
+   kaleidoscope::papageno::PPG_KLS_KEYPOS_INPUT(UNIQUE_ID)
 
 // This macro is used by the Glockenspiel compiled code to initialize
 // keycode based inputs. It boils down to the name of a constexpr integer that
 // references the input.
 //  
-#define GLS_INPUT_INITIALIZE___KEYCODE(ID) \
-   kaleidoscope::papageno::PPG_KLS_KEYCODE_INPUT(ID)
+#define GLS_INPUT_INITIALIZE___KEYCODE(UNIQUE_ID, USER_ID) \
+   kaleidoscope::papageno::PPG_KLS_KEYCODE_INPUT(UNIQUE_ID)
 
 // This macro is used by the Glockenspiel compiled code to initialize
 // keycode based inputs. It boils down to the name of a constexpr integer that
 // references the input.
 //  
-#define GLS_INPUT_INITIALIZE___COMPLEX_KEYCODE(ID, KEYCODE) \
-   kaleidoscope::papageno::PPG_KLS_KEYCODE_INPUT(ID)
+#define GLS_INPUT_INITIALIZE___COMPLEX_KEYCODE(UNIQUE_ID, USER_ID, KEYCODE) \
+   kaleidoscope::papageno::PPG_KLS_KEYCODE_INPUT(UNIQUE_ID)
    
 // Keycode actions are compile time constant and can thus already
 // assigned when the global static Papageno search tree is initialized.
@@ -127,7 +128,7 @@ __NL__         __GLS_DI__(user_data) reinterpret_cast<void*>((__VA_ARGS__).raw) 
 __NL__      }                                                                  \
 __NL__   } 
 
-#define GLS_ACTION_INITIALIZE___COMPLEX_KEYCODE(ID, ...)                       \
+#define GLS_ACTION_INITIALIZE___COMPLEX_KEYCODE(UNIQUE_ID, USER_ID, ...)                       \
 __NL__   {                                                                     \
 __NL__      __GLS_DI__(callback)  {                                                \
 __NL__         __GLS_DI__(func) (PPG_Action_Callback_Fun)                          \
@@ -136,7 +137,7 @@ __NL__         __GLS_DI__(user_data) reinterpret_cast<void*>((__VA_ARGS__).raw) 
 __NL__      }                                                                  \
 __NL__   } 
 
-#define GLS_ACTION_INITIALIZE___KEYPOS(ID, ROW, COL)                           \
+#define GLS_ACTION_INITIALIZE___KEYPOS(UNIQUE_ID, USER_ID, ROW, COL)                           \
 __NL__   {                                                                     \
 __NL__      __GLS_DI__(callback)  {                                                \
 __NL__         __GLS_DI__(func) (PPG_Action_Callback_Fun)                          \
@@ -145,7 +146,7 @@ __NL__         __GLS_DI__(user_data) (void*)(uint16_t((ROW) << 8 | (COL)))      
 __NL__      }                                                                  \
 __NL__   } 
    
-#define GLS_ACTION_INITIALIZE___USER_FUNCTION(ID, FUNC, USER_DATA)             \
+#define GLS_ACTION_INITIALIZE___USER_FUNCTION(UNIQUE_ID, USER_ID, FUNC, USER_DATA)             \
 __NL__   {                                                                     \
 __NL__      __GLS_DI__(callback)  {                                                \
 __NL__         __GLS_DI__(func) (PPG_Action_Callback_Fun)FUNC,                     \
