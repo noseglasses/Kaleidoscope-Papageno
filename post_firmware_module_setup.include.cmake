@@ -16,5 +16,4 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
    
 # message("Module source dir: ${KALEIDOSCOPE_MODULE_SOURCE_DIR}"))
-message("Post setup")
 add_dependencies("kaleidoscope.firmware" kaleidoscope_papageno_glockenspiel_compile)

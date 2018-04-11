@@ -16,17 +16,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
    
 # message("Module source dir: ${KALEIDOSCOPE_MODULE_SOURCE_DIR}")
+message("CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
+message("KALEIDOSCOPE_HOST_BUILD: ${KALEIDOSCOPE_HOST_BUILD}")
 
-message("Pre setup")
 # Setup papageno as a Arduino library
 #
+message("Start setup papageno")
 execute_process(
    COMMAND "${CMAKE_COMMAND}"
       "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
       "-DKALEIDOSCOPE_MODULE_SOURCE_DIR=${KALEIDOSCOPE_MODULE_SOURCE_DIR}"
+      "-DKALEIDOSCOPE_HOST_BUILD=${KALEIDOSCOPE_HOST_BUILD}"
        -P "${KALEIDOSCOPE_MODULE_SOURCE_DIR}/setup_library.script.cmake"
    WORKING_DIRECTORY "${KALEIDSCOPE_MODULE_SOURCE_DIR}"
 )
+message("End setup papageno")
 
 # Make sure that any papageno headers are found during the firmware build.
 #
@@ -45,6 +49,7 @@ set(cmake_cache_file "${papageno_build_dir}/CMakeCache.txt")
 add_custom_command(
    OUTPUT "${cmake_cache_file}"
    COMMAND "${CMAKE_COMMAND}" 
+      "-DPAPAGENO_BUILD_LIBRARY=FALSE"
       "-DPAPAGENO_BUILD_GLOCKENSPIEL=TRUE"
       "-DPAPAGENO_TESTING_ENABLED=FALSE"
       "${KALEIDOSCOPE_MODULE_SOURCE_DIR}/3rd_party/Papageno"

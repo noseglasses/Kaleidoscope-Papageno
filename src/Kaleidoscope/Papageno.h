@@ -116,7 +116,7 @@ extern kaleidoscope::papageno::Papageno Papageno;
 #define GLS_INPUT_INITIALIZE___COMPLEX_KEYCODE(UNIQUE_ID, USER_ID, KEYCODE) \
    kaleidoscope::papageno::PPG_KLS_KEYCODE_INPUT(UNIQUE_ID)
    
-// Keycode actions are compile time constant and can thus already
+// Keycode actions are compile time constant and can thus already be
 // assigned when the global static Papageno search tree is initialized.
 //
 #define GLS_ACTION_INITIALIZE___KEYCODE(...)                                   \
