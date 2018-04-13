@@ -44,8 +44,8 @@ class Papageno : public KaleidoscopePlugin
             
       // Some utility functions required by Papageno's API
       //
-      static void processKeycode(bool activation, void *user_data);
-      static void processKeypos(bool activation, void *user_data);
+      static void processKeycode(PPG_Count activation_flags, void *user_data);
+      static void processKeypos(PPG_Count activation_flags, void *user_data);
       
    private:
 

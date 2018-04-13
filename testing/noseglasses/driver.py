@@ -26,7 +26,11 @@ class NoseglassesTest(TestDriver):
             
       self.keyDown(*key)
       self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
       self.keyUp(*key)
+      self.scanCycle()
+      self.scanCycle()
       self.scanCycle()
 
    def run(self):
@@ -35,33 +39,40 @@ class NoseglassesTest(TestDriver):
 "This tests noseglasses' firmware sketch.\n"
       )
       
-      leftThumb1 = (0, 7)
-      leftThumb2 = (1, 7)
-      leftThumb3 = (2, 7)
-      leftThumb4 = (3, 7)
+      self.leftThumb1 = (0, 7)
+      self.leftThumb2 = (1, 7)
+      self.leftThumb3 = (2, 7)
+      self.leftThumb4 = (3, 7)
       
-      rightThumb1 = (3, 8)
-      rightThumb2 = (2, 8)
-      rightThumb3 = (1, 8)
-      rightThumb4 = (0, 8)
+      self.rightThumb1 = (3, 8)
+      self.rightThumb2 = (2, 8)
+      self.rightThumb3 = (1, 8)
+      self.rightThumb4 = (0, 8)
       
-      special1 = (0, 13)
-      special2 = (0, 15)
-      special3 = (0,  0)
-      special4 = (0,  1)
-      special5 = (0,  2)
-      special6 = (0,  3)
+      self.special1 = (0, 13)
+      self.special2 = (0, 15)
+      self.special3 = (0,  0)
+      self.special4 = (0,  1)
+      self.special5 = (0,  2)
+      self.special6 = (0,  3)
       
-      ng_Key_E = (2,  3)
-      ng_Key_O = (2, 13)
-      ng_Key_I = (2, 12)
-      ng_Key_S = (2,  2)
+      self.ng_Key_E = (2,  3)
+      self.ng_Key_O = (2, 13)
+      self.ng_Key_I = (2, 12)
+      self.ng_Key_S = (2,  2)
       
-      ng_Key_A = (2,  1)
+      self.ng_Key_A = (2,  1)
+      self.ng_Key_C = (3,  3)
             
+      self.errorIfReportWithoutQueuedAssertions = True
+      
       self.addPermanentReportAssertions([ 
          DumpReport()
       ])
+      
+      self.runTestSeries()
+      
+   def test1(self):
             
       self.header("A cluster that causes enter (key order arbitrary)")
       #
@@ -70,10 +81,15 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportKeysActive([keyEnter()], exclusively = True)
       ])
-      self.keyTap(leftThumb3)
-      self.keyTap(rightThumb2)
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.keyTap(self.leftThumb3)
+      self.keyTap(self.rightThumb2)
       self.checkStatus()
 
+   def test2(self):
+      
       self.header("Double tap on the left inner thumb key triggers a user function")
       #
       # |LeftThumb3|*2 : doubleTab
@@ -90,9 +106,11 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(leftThumb3)
-      self.keyTap(leftThumb3)
+      self.keyTap(self.leftThumb3)
+      self.keyTap(self.leftThumb3)
       self.checkStatus()
+      
+   def test3(self):
       
       self.header("A note line with two thumb keys triggers tab")
       #
@@ -104,10 +122,12 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(leftThumb3)
-      self.keyTap(rightThumb3)
+      self.keyTap(self.leftThumb3)
+      self.keyTap(self.rightThumb3)
       self.checkStatus()
 
+   def test4(self):
+      
       self.header("Double tap on right inner thumb key")
       #
       # |RightThumb2|*2 : aShiftTab
@@ -119,9 +139,11 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(rightThumb2)
-      self.keyTap(rightThumb2)
+      self.keyTap(self.rightThumb2)
+      self.keyTap(self.rightThumb2)
       self.checkStatus()
+      
+   def test5(self):
       
       self.header("Note line for key delete")
       #
@@ -133,10 +155,12 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(rightThumb2)
-      self.keyTap(leftThumb2)
+      self.keyTap(self.rightThumb2)
+      self.keyTap(self.leftThumb2)
       self.checkStatus()
 
+   def test6(self):
+      
       self.header("|Special1|*2 : repeatLastCommand")
       #
       self.queueGroupedReportAssertions([
@@ -151,9 +175,11 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(special1)
-      self.keyTap(special1)
+      self.keyTap(self.special1)
+      self.keyTap(self.special1)
       self.checkStatus()
+      
+   def test7(self):
       
       # Search commands
       #
@@ -174,10 +200,12 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(special3)
-      self.keyTap(special3)
+      self.keyTap(self.special3)
+      self.keyTap(self.special3)
       self.skipTime(500) # Enable timeout
       self.checkStatus()
+      
+   def test8(self):
       
       self.header("File search")
       #
@@ -194,11 +222,13 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(special3)
-      self.keyTap(special3)
-      self.keyTap(special3)
+      self.keyTap(self.special3)
+      self.keyTap(self.special3)
+      self.keyTap(self.special3)
       self.checkStatus()
 
+   def test9(self):
+      
       self.header("Search with ctrl-F")
       #
       # |Special4|*2 : leftCTRL_F
@@ -210,9 +240,11 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(special4)
-      self.keyTap(special4)
+      self.keyTap(self.special4)
+      self.keyTap(self.special4)
       self.checkStatus()
+      
+   def test10(self):
       
       self.header("Hit F3")
       #
@@ -224,9 +256,11 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(special5)
-      self.keyTap(special5)
+      self.keyTap(self.special5)
+      self.keyTap(self.special5)
       self.checkStatus()
+      
+   def test11(self):
       
       self.header("Shift-Ctrl-C")
       #
@@ -239,10 +273,12 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(special6)
-      self.keyTap(special6)
+      self.keyTap(self.special6)
+      self.keyTap(self.special6)
       self.checkStatus()
 
+   def test12(self):
+      
       # Assign german umlauts as tripple taps to
       # suitable and non-colliding (digraphs!) keys of the home row
       #
@@ -265,10 +301,12 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(ng_Key_E)
-      self.keyTap(ng_Key_E)
-      self.keyTap(ng_Key_E)
+      self.keyTap(self.ng_Key_E)
+      self.keyTap(self.ng_Key_E)
+      self.keyTap(self.ng_Key_E)
       self.checkStatus()
+      
+   def test13(self):
       
       self.header("|NG_Key_O|*3 : umlaut_O")
       #
@@ -279,10 +317,12 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(ng_Key_O)
-      self.keyTap(ng_Key_O)
-      self.keyTap(ng_Key_O)
+      self.keyTap(self.ng_Key_O)
+      self.keyTap(self.ng_Key_O)
+      self.keyTap(self.ng_Key_O)
       self.checkStatus()
+      
+   def test14(self):
       
       self.header("|NG_Key_I|*3 : umlaut_U")
       #
@@ -293,10 +333,12 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(ng_Key_I)
-      self.keyTap(ng_Key_I)
-      self.keyTap(ng_Key_I)
+      self.keyTap(self.ng_Key_I)
+      self.keyTap(self.ng_Key_I)
+      self.keyTap(self.ng_Key_I)
       self.checkStatus()
+      
+   def test15(self):
       
       self.header("|NG_Key_S|*3 : umlaut_S")
       #
@@ -307,10 +349,12 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(ng_Key_S)
-      self.keyTap(ng_Key_S)
-      self.keyTap(ng_Key_S)
+      self.keyTap(self.ng_Key_S)
+      self.keyTap(self.ng_Key_S)
+      self.keyTap(self.ng_Key_S)
       self.checkStatus()
+      
+   def test16(self):
       
       # Check some corner cases
       #
@@ -322,14 +366,16 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyDown(*rightThumb2)
+      self.keyDown(*self.rightThumb2)
       self.scanCycle()
-      self.keyDown(*ng_Key_A)
+      self.keyDown(*self.ng_Key_A)
       self.scanCycle()
-      self.keyUp(*ng_Key_A)
-      self.keyUp(*rightThumb2)
+      self.keyUp(*self.ng_Key_A)
+      self.keyUp(*self.rightThumb2)
       self.scanCycle()
       self.checkStatus()
+      
+   def test17(self):
       
       self.header("M1 and a - 2")
       self.queueGroupedReportAssertions([
@@ -339,25 +385,185 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyDown(*rightThumb2)
+      self.keyDown(*self.rightThumb2)
       self.scanCycle()
       self.scanCycle()
       self.scanCycle()
-      self.keyUp(*rightThumb2)
+      self.keyUp(*self.rightThumb2)
       self.scanCycle()
       self.scanCycle()
       self.scanCycle()
-      self.keyDown(*ng_Key_A)
+      self.keyDown(*self.ng_Key_A)
       self.scanCycle()
       self.scanCycle()
       self.scanCycle()
-      self.keyUp(*ng_Key_A)
+      self.keyUp(*self.ng_Key_A)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.checkStatus()
+
+   def test18(self):
+      
+      self.header("Capitals with one shot shift")
+      
+      # As the a key arrives in another cycle than the one shot key's
+      # activation. First a shift-alone report is send.
+      #
+      self.queueGroupedReportAssertions([
+         ReportAllKeysInactive(),
+         ReportModifiersActive([keyLShift()], exclusively = True)
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyA()], exclusively = True),
+         ReportModifiersActive([keyLShift()], exclusively = True)
+      ])
+      # No idea why this report with just the key and no shift
+      # is generated. But it seems to work nontheless.
+      #
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyA()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.keyDown(*self.leftThumb3)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.keyUp(*self.leftThumb3)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.keyDown(*self.ng_Key_A)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.keyUp(*self.ng_Key_A)
       self.scanCycle()
       self.scanCycle()
       self.scanCycle()
       self.checkStatus()
       
+   def test19(self):
 
+      self.header("i, c")
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyI()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyC()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.keyTap(self.ng_Key_I)
+      self.keyTap(self.ng_Key_C)
+      
+   def test20(self):
+
+      self.header("i, s, c")
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyI()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyS()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyC()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.keyTap(self.ng_Key_I)
+      self.keyTap(self.ng_Key_S)
+      self.keyTap(self.ng_Key_C)
+      
+   def test21(self):
+      
+      self.header("Held double s")
+      
+      # A held double-s should cause the tap timeout to expire 
+      # and result in a sequence of s being send
+      #
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyS()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyS()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      # Key s will be kept held
+      self.keyTap(self.ng_Key_S)
+      self.keyDown(*self.ng_Key_S)
+      
+      self.skipTime(500)
+      self.keyUp(*self.ng_Key_S)
+      
+   def test22(self):
+      
+      self.header("Capital umlaut A")
+      
+      # A held double-s should cause the tap timeout to expire 
+      # and result in a sequence of s being send
+      #
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyA()], exclusively = True),
+         ReportModifiersActive([keyRAlt(), keyLShift()], exclusively = True)
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      # Key s will be kept held
+      self.keyTap(self.leftThumb3)
+      self.keyTap(self.ng_Key_I)
+      self.keyTap(self.ng_Key_I)
+      self.keyTap(self.ng_Key_I)
+      
+   def runTestSeries(self):
+      
+      #self.test1()
+      #self.test2()
+      #self.test3()
+      #self.test4()
+      #self.test5()
+      #self.test6()
+      #self.test7()
+      #self.test8()
+      #self.test9()
+      #self.test10()
+      #self.test11()
+      #self.test12()
+      #self.test13()
+      #self.test14()
+      #self.test15()
+      #self.test16()
+      #self.test17()
+      #self.test18()
+      #self.test19()
+      #self.test20()
+      #self.test21()
+      self.test22()
+      
 def main():
     
    test = NoseglassesTest()

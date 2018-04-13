@@ -558,13 +558,13 @@ glockenspiel_end
 
 inline
 void pressKey(const Key &k) {
-   handleKeyswitchEvent(k, UNKNOWN_KEYSWITCH_LOCATION, IS_PRESSED | INJECTED);
+   handleKeyswitchEvent(k, UNKNOWN_KEYSWITCH_LOCATION, IS_PRESSED/* | INJECTED*/);
    kaleidoscope::hid::sendKeyboardReport();
 }
 
 inline
 void releaseKey(const Key &k) {
-   handleKeyswitchEvent(k, UNKNOWN_KEYSWITCH_LOCATION, WAS_PRESSED | INJECTED);
+   handleKeyswitchEvent(k, UNKNOWN_KEYSWITCH_LOCATION, WAS_PRESSED/* | INJECTED*/);
    kaleidoscope::hid::sendKeyboardReport();
 }
 
@@ -574,12 +574,19 @@ void tapKey(const Key &k) {
    releaseKey(k);
 }
 
+#define NG_CALLBACK_NO_REPEAT \
+   if(activation_flags & PPG_Action_Activation_Flags_Repeated) { return; }
+   
+#define NG_CALLBACK_ONLY_ACTIVATION \
+   if(!(activation_flags & PPG_Action_Activation_Flags_Active)) { return; }
+   
 // User callback the emulates double tab for
 // shell auto completion
 //
-void doubleTabCB(bool activation, void *user_data)
+void doubleTabCB(PPG_Count activation_flags, void *user_data)
 {
-   if(!activation) { return; }
+   NG_CALLBACK_NO_REPEAT
+   NG_CALLBACK_ONLY_ACTIVATION
    
    tapKey(Key_Tab);
    tapKey(Key_Tab);
@@ -588,9 +595,10 @@ void doubleTabCB(bool activation, void *user_data)
 // User callback that repeats the most recent shell
 // command
 //
-void repeatLastCommandCB(bool activation, void *user_data)
+void repeatLastCommandCB(PPG_Count activation_flags, void *user_data)
 {
-   if(!activation) { return; }
+   NG_CALLBACK_NO_REPEAT
+   NG_CALLBACK_ONLY_ACTIVATION
    
    tapKey(Key_UpArrow);
    tapKey(Key_Enter);
@@ -601,9 +609,10 @@ void repeatLastCommandCB(bool activation, void *user_data)
 // opens the search entry with the string that the cursor
 // currently rests on.
 //
-void ordinarySearchCB(bool activation, void *user_data)
+void ordinarySearchCB(PPG_Count activation_flags, void *user_data)
 {
-   if(!activation) { return; }
+   NG_CALLBACK_NO_REPEAT
+   NG_CALLBACK_ONLY_ACTIVATION
    
    tapKey(LCTRL(Key_F));
    tapKey(Key_Enter);
@@ -614,20 +623,21 @@ void ordinarySearchCB(bool activation, void *user_data)
 // that have been customized to feature Shift+F1
 // as command to open the search-in-files menu.
 //
-void fileSearchCB(bool activation, void *user_data)
+void fileSearchCB(PPG_Count activation_flags, void *user_data)
 {
-   if(!activation) { return; }
+   NG_CALLBACK_NO_REPEAT
+   NG_CALLBACK_ONLY_ACTIVATION
    
    tapKey(LSHIFT(Key_F1));
    tapKey(Key_Enter);
 }
 
-void umlautCB(bool activation, void *user_data)
+void umlautCB(PPG_Count activation_flags, void *user_data)
 {
    Key k;
    k.raw = (uint16_t)user_data;
    
-   if(activation) {
+   if(activation_flags & PPG_Action_Activation_Flags_Active) {
       pressKey(RALT(k));
    }
    else {
