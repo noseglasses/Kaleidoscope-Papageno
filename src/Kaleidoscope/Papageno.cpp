@@ -21,7 +21,7 @@
 #include <kaleidoscope/hid.h>
 
 extern "C" {
-// #include "detail/ppg_event_buffer_detail.h"
+#include "detail/ppg_pattern_matching_detail.h"
 #include "detail/ppg_active_tokens_detail.h"
 #include "detail/ppg_context_detail.h"
 }
@@ -29,20 +29,6 @@ extern "C" {
 #define PPG_KLS_LOGGING_ENABLED
 
 #ifdef PPG_KLS_LOGGING_ENABLED
-
-// #define PPG_KLS_LOG(TOKEN) \
-//    Serial.print(TOKEN); \
-//    Serial.flush();
-//    
-// #define PPG_KLS_LOGN(TOKEN) \
-//    Serial.println(TOKEN); \
-//    Serial.flush();
-
-// extern "C" {
-//    void serial_print(const char *c) {
-//       Serial.print(c);
-//    }
-// }
 
 #include <iostream>
 
@@ -98,6 +84,8 @@ enum PapagenoState {
 
 static uint8_t state = PapagenoInitialized;
 
+static bool failureOccurred = false;
+
 static uint8_t loopCycleCount = 0;
 
 static int16_t lastEventGroupId = -1;
@@ -110,11 +98,16 @@ static uint8_t getKeystate(bool pressed)
 
 static void finishLoopCycle(uint8_t groupId)
 {
-   if(lastEventGroupId == groupId) { return; }
+   if(lastEventGroupId == groupId) { 
       
-   PPG_KLS_LOGN("New cycle " << (int)groupId << ", sending report")
-   
+      PPG_KLS_LOGN("Still same cycle " << (int)groupId << ", no loop hook processing")
+      return; 
+   }
+      
+   PPG_KLS_LOGN("New cycle " << (int)groupId << ", processing loop hooks")
+ 
    Kaleidoscope.processLoopHooks();
+//    Kaleidoscope.loop();
    
    lastEventGroupId = groupId;
 }
@@ -142,12 +135,14 @@ static void flushEvent(PPG_Event *event)
    uint8_t keyState = kaleidoscope::papageno::getKeystate(
       event->flags & PPG_Event_Active);
    
-   // Flushed events must be processed in the same way as 
-   // they arrived. Those events that arrived within the same
-   // Kaleidoscope-loop cycle. The loop cycle (modulo 0xFF)
-   // is used as event group id.
-   //
-   finishLoopCycle(event->groupId);
+   if(event->flags & PPG_Event_Active) {
+      // Flushed events must be processed in the same way as 
+      // they arrived. Those events that arrived within the same
+      // Kaleidoscope-loop cycle. The loop cycle (modulo 0xFF)
+      // is used as event group id.
+      //
+      finishLoopCycle(event->groupId);
+   }
       
    // Note: Input-IDs are assigned contiguously
    //
@@ -176,7 +171,10 @@ static void flushEvent(PPG_Event *event)
       PPG_KLS_LOG("event ")
       PPG_KLS_LOG((uint16_t)event)
       PPG_KLS_LOG(", input ")
-      PPG_KLS_LOGN((int)event->input)
+      PPG_KLS_LOG((int)event->input)
+      PPG_KLS_LOG(", group ")
+      PPG_KLS_LOGN((int)event->groupId)
+      
       PPG_KLS_LOG("flushing event by keypos (")
       PPG_KLS_LOG((int)ppg_kls_keypos_lookup[event->input].row)
       PPG_KLS_LOG(", ")
@@ -190,6 +188,15 @@ static void flushEvent(PPG_Event *event)
                            ppg_kls_keypos_lookup[event->input].col,
                            keyState);
    } 
+   
+//    if(!(event->flags & PPG_Event_Active)) {
+//       // Flushed events must be processed in the same way as 
+//       // they arrived. Those events that arrived within the same
+//       // Kaleidoscope-loop cycle. The loop cycle (modulo 0xFF)
+//       // is used as event group id.
+//       //
+//       finishLoopCycle(event->groupId);
+//    }
 }
 
 static void processEventCallback(   
@@ -257,17 +264,20 @@ static void signalCallback(PPG_Signal_Id signal_id, void *)
       case PPG_On_Abort:
          PPG_KLS_LOGN("Abort")
          papageno::state = PapagenoAborted;
+         failureOccurred = true;
          papageno::flushEvents();
          break;
       case PPG_On_Timeout:
          PPG_KLS_LOGN("Timeout")
          papageno::state = PapagenoTimeout;
+         failureOccurred = true;
          papageno::flushEvents();
          break;
       case PPG_On_Match_Failed:
          PPG_KLS_LOGN("Match failed")
          // Let 
          //papageno::state = PapagenoMatchFailed;
+         failureOccurred = true;
          // Events are flushed automatically
          break;      
       case PPG_On_Flush_Events:
@@ -275,7 +285,12 @@ static void signalCallback(PPG_Signal_Id signal_id, void *)
          papageno::flushEvents();
          break;
       case PPG_On_Initialization:
+         PPG_KLS_LOGN("On initialization")
          papageno::state = PapagenoInitialized;
+         break;
+      case PPG_Before_Action:
+         PPG_KLS_LOGN("Before action")
+//          finishCurrentLoopCycle();
          break;
       default:
          return;
@@ -324,7 +339,8 @@ static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
    }
    else if(!keyToggledOff(key_state)) {
 
-      // It the key remains pressed, we just ignore it
+      // If the key remains pressed, we just ignore it
+      //
       keyStateChanged = false;
    }
    
@@ -390,6 +406,8 @@ static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
                keycode = Layer.lookupOnActiveLayer(row, col);
             }
             
+            PPG_KLS_LOGN("Events flushed: " << (int)papageno::eventsFlushed_)
+            
             PPG_KLS_LOGN("after: keycode " << keycode.raw
                << ", layerState " << Layer.getLayerState())
          }
@@ -408,17 +426,17 @@ static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
 //                         record->event.key.col);
 //   }
 
-   PPG_KLS_LOG("input ")
-   PPG_KLS_LOG((int)input)
-   PPG_KLS_LOG(", row ")
-   PPG_KLS_LOG((int)row)
-   PPG_KLS_LOG(", col ")
-   PPG_KLS_LOG((int)col)
-   PPG_KLS_LOG(", keycode ")
-   PPG_KLS_LOG((int)keycode.raw)
-   PPG_KLS_LOG(", key_state ")
-   PPG_KLS_LOG((int)key_state)
-   PPG_KLS_LOGN("")
+//    PPG_KLS_LOG("input ")
+//    PPG_KLS_LOG((int)input)
+//    PPG_KLS_LOG(", row ")
+//    PPG_KLS_LOG((int)row)
+//    PPG_KLS_LOG(", col ")
+//    PPG_KLS_LOG((int)col)
+//    PPG_KLS_LOG(", keycode ")
+//    PPG_KLS_LOG((int)keycode.raw)
+//    PPG_KLS_LOG(", key_state ")
+//    PPG_KLS_LOG((int)key_state)
+//    PPG_KLS_LOGN("")
    
 //    // Check it the pattern matching engine is in initial state
 //    //
@@ -427,25 +445,35 @@ static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
 //    }
    
    if(!keyStateChanged) {
+      
+      PPG_KLS_LOGN("papageno::state = " << (int)papageno::state)
             
-      // The key is obviously an input. It there are nevertheless no events in the buffer this means that a previous match with the key failed.
+      // The key is obviously an input. If there are nevertheless no events in the buffer this means that a previous match with the key failed.
       // In such a case, we pass it back to Kaleidoscope immediately.
       //
-      switch(papageno::state) {
-         case PapagenoInProgress:
-         case PapagenoInitialized:
-            break;
-         default:
-         {
-            PPG_KLS_LOG("Bad engine state => passing keycode\n")
-            return keycode;
-         }
+      if(failureOccurred
+         && !ppg_pattern_matching_in_progress()
+      ) {
+         PPG_KLS_LOG("Bad engine state => passing keycode\n")
+         return keycode;
       }
       
       // Just ignore keys that represent inputs that already became 
       // activated and that are active but whose state did not change.
       //
       return Key_NoKey;
+   }
+   
+   // Clear failure state
+   //
+   failureOccurred = false;
+   
+   // Non activation events are ignored if there are no active tokens
+   // and no queued events.
+   //
+   if((ppg_event_buffer_size() == 0) && (ppg_active_tokens_get_size() == 0)
+      && (flags == PPG_Event_Flags_Empty)) {
+      return keycode;
    }
  
 //    std::cout << "eventHandlerHook: keycode.raw = " << (int)keycode.raw 
@@ -468,6 +496,8 @@ static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
    ppg_global_set_layer(cur_layer);
    
    papageno::state = PapagenoInProgress;
+   
+   PPG_KLS_LOGN("Feeding event")
    
    ppg_event_process(&p_event);
    
@@ -549,8 +579,6 @@ void
    Papageno
       ::processKeycode(PPG_Count activation_flags, void *user_data)
 {   
-   finishCurrentLoopCycle();
-   
    Key key 
       = (Key){ .raw 
             = reinterpret_cast<uint16_t>(user_data)};
@@ -574,8 +602,6 @@ void
 
 void processKeypos(PPG_Count activation_flags, void *user_data)
 {
-   finishCurrentLoopCycle();
-   
    uint16_t raw = (uint16_t)user_data;
    uint8_t row = raw >> 8;
    uint8_t col = raw & 0x00FF;

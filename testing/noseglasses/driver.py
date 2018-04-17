@@ -63,6 +63,8 @@ class NoseglassesTest(TestDriver):
       
       self.ng_Key_A = (2,  1)
       self.ng_Key_C = (3,  3)
+      self.ng_Key_X = (3,  2)
+      self.ng_Key_Z = (3,  1)
             
       self.errorIfReportWithoutQueuedAssertions = True
       
@@ -453,9 +455,9 @@ class NoseglassesTest(TestDriver):
          ReportKeysActive([keyI()], exclusively = True),
          ReportAllModifiersInactive()
       ])
-      self.queueGroupedReportAssertions([
-         ReportEmpty()
-      ])
+      #self.queueGroupedReportAssertions([
+         #ReportEmpty()
+      #])
       self.queueGroupedReportAssertions([
          ReportKeysActive([keyC()], exclusively = True),
          ReportAllModifiersInactive()
@@ -465,6 +467,8 @@ class NoseglassesTest(TestDriver):
       ])
       self.keyTap(self.ng_Key_I)
       self.keyTap(self.ng_Key_C)
+      
+      self.checkStatus()
       
    def test20(self):
 
@@ -480,9 +484,9 @@ class NoseglassesTest(TestDriver):
          ReportKeysActive([keyS()], exclusively = True),
          ReportAllModifiersInactive()
       ])
-      self.queueGroupedReportAssertions([
-         ReportEmpty()
-      ])
+      #self.queueGroupedReportAssertions([
+         #ReportEmpty()
+      #])
       self.queueGroupedReportAssertions([
          ReportKeysActive([keyC()], exclusively = True),
          ReportAllModifiersInactive()
@@ -493,6 +497,8 @@ class NoseglassesTest(TestDriver):
       self.keyTap(self.ng_Key_I)
       self.keyTap(self.ng_Key_S)
       self.keyTap(self.ng_Key_C)
+      
+      self.checkStatus()
       
    def test21(self):
       
@@ -517,7 +523,17 @@ class NoseglassesTest(TestDriver):
       self.keyDown(*self.ng_Key_S)
       
       self.skipTime(500)
+      self.checkStatus()
+      
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
       self.keyUp(*self.ng_Key_S)
+      
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.checkStatus()
       
    def test22(self):
       
@@ -525,44 +541,196 @@ class NoseglassesTest(TestDriver):
       
       # A held double-s should cause the tap timeout to expire 
       # and result in a sequence of s being send
+      
+      self.queueGroupedReportAssertions([
+         ReportAllKeysInactive(),
+         ReportModifiersActive([keyLShift()], exclusively = True)
+      ])
+            
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyU()], exclusively = True),
+         ReportModifiersActive([keyRAlt(), keyLShift()], exclusively = True)
+      ])
+      
+      # The OneShot shift is removed but the rest remains until the
+      # i-key is released.
       #
       self.queueGroupedReportAssertions([
-         ReportKeysActive([keyA()], exclusively = True),
-         ReportModifiersActive([keyRAlt(), keyLShift()], exclusively = True)
+         ReportKeysActive([keyU()], exclusively = True),
+         ReportModifiersActive([keyRAlt(), ], exclusively = True)
+      ])
+
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      
+      # Make sure that finally, everything continues to work normally
+      #
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyI()], exclusively = True),
+         ReportAllModifiersInactive()
       ])
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      # Key s will be kept held
+      
       self.keyTap(self.leftThumb3)
       self.keyTap(self.ng_Key_I)
       self.keyTap(self.ng_Key_I)
       self.keyTap(self.ng_Key_I)
       
+      self.keyTap(self.ng_Key_I)
+      
+      self.skipTime(500)
+      self.checkStatus()
+      
+   def test23(self):
+      
+      self.header("OneShot C")
+           
+      self.queueGroupedReportAssertions([
+         ReportAllKeysInactive(),
+         ReportModifiersActive([keyLShift()], exclusively = True)
+      ])
+      
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyC()], exclusively = True),
+         ReportModifiersActive([keyLShift()], exclusively = True)
+      ])
+      
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyC()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+         
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      
+      self.keyDown(*self.leftThumb3)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      #self.skipTime(500)
+      self.keyDown(*self.ng_Key_C)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.keyUp(*self.leftThumb3)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.keyUp(*self.ng_Key_C)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.checkStatus()
+      
+   def test24(self):
+      
+      self.header("x")
+      
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyX()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      
+      self.keyTap(self.ng_Key_X);
+      
+      self.checkStatus()
+   
+   def test25(self):
+      
+      self.header("z")
+      
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyZ()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      
+      self.keyTap(self.ng_Key_Z);
+      
+      self.checkStatus()
+      
+   def test26(self):
+      
+      self.header("s, e")
+      
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyS()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyE()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      
+      self.keyDown(*self.ng_Key_S)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      #self.skipTime(500)
+      self.keyDown(*self.ng_Key_E)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.keyUp(*self.ng_Key_S)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.skipTime(500)
+      self.keyUp(*self.ng_Key_E)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.skipTime(500)
+      self.checkStatus()
+      
    def runTestSeries(self):
       
-      #self.test1()
-      #self.test2()
-      #self.test3()
-      #self.test4()
-      #self.test5()
-      #self.test6()
-      #self.test7()
-      #self.test8()
-      #self.test9()
-      #self.test10()
-      #self.test11()
-      #self.test12()
-      #self.test13()
-      #self.test14()
-      #self.test15()
-      #self.test16()
-      #self.test17()
-      #self.test18()
-      #self.test19()
-      #self.test20()
-      #self.test21()
+      self.test1()
+      self.test2()
+      self.test3()
+      self.test4()
+      self.test5()
+      self.test6()
+      self.test7()
+      self.test8()
+      self.test9()
+      self.test10()
+      self.test11()
+      self.test12()
+      self.test13()
+      self.test14()
+      self.test15()
+      self.test16()
+      self.test17()
+      self.test18()
+      self.test19()
+      self.test20()
+      self.test21()
       self.test22()
+      self.test23()
+      self.test24()
+      self.test25()
+      self.test26()
       
 def main():
     

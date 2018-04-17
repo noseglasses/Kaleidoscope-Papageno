@@ -557,21 +557,21 @@ glockenspiel_end
 */
 
 inline
-void pressKey(const Key &k) {
-   handleKeyswitchEvent(k, UNKNOWN_KEYSWITCH_LOCATION, IS_PRESSED/* | INJECTED*/);
+void pressKey(const Key &k, uint16_t flags = 0) {
+   handleKeyswitchEvent(k, UNKNOWN_KEYSWITCH_LOCATION, IS_PRESSED | flags);
    kaleidoscope::hid::sendKeyboardReport();
 }
 
 inline
-void releaseKey(const Key &k) {
-   handleKeyswitchEvent(k, UNKNOWN_KEYSWITCH_LOCATION, WAS_PRESSED/* | INJECTED*/);
+void releaseKey(const Key &k, uint16_t flags = 0) {
+   handleKeyswitchEvent(k, UNKNOWN_KEYSWITCH_LOCATION, WAS_PRESSED | flags);
    kaleidoscope::hid::sendKeyboardReport();
 }
 
 inline 
-void tapKey(const Key &k) {
-   pressKey(k);
-   releaseKey(k);
+void tapKey(const Key &k, uint16_t flags = 0) {
+   pressKey(k, flags);
+   releaseKey(k, flags);
 }
 
 #define NG_CALLBACK_NO_REPEAT \
@@ -588,8 +588,8 @@ void doubleTabCB(PPG_Count activation_flags, void *user_data)
    NG_CALLBACK_NO_REPEAT
    NG_CALLBACK_ONLY_ACTIVATION
    
-   tapKey(Key_Tab);
-   tapKey(Key_Tab);
+   tapKey(Key_Tab, INJECTED);
+   tapKey(Key_Tab, INJECTED);
 }
 
 // User callback that repeats the most recent shell
@@ -600,8 +600,8 @@ void repeatLastCommandCB(PPG_Count activation_flags, void *user_data)
    NG_CALLBACK_NO_REPEAT
    NG_CALLBACK_ONLY_ACTIVATION
    
-   tapKey(Key_UpArrow);
-   tapKey(Key_Enter);
+   tapKey(Key_UpArrow, INJECTED);
+   tapKey(Key_Enter, INJECTED);
 }
 
 // Issues a search command that can be used with
@@ -614,8 +614,8 @@ void ordinarySearchCB(PPG_Count activation_flags, void *user_data)
    NG_CALLBACK_NO_REPEAT
    NG_CALLBACK_ONLY_ACTIVATION
    
-   tapKey(LCTRL(Key_F));
-   tapKey(Key_Enter);
+   tapKey(LCTRL(Key_F), INJECTED);
+   tapKey(Key_Enter, INJECTED);
 }
 
 // Similar the search callback above, but for a search
@@ -628,20 +628,28 @@ void fileSearchCB(PPG_Count activation_flags, void *user_data)
    NG_CALLBACK_NO_REPEAT
    NG_CALLBACK_ONLY_ACTIVATION
    
-   tapKey(LSHIFT(Key_F1));
-   tapKey(Key_Enter);
+   tapKey(LSHIFT(Key_F1), INJECTED);
+   tapKey(Key_Enter, INJECTED);
 }
 
 void umlautCB(PPG_Count activation_flags, void *user_data)
 {
+//    NG_CALLBACK_NO_REPEAT
+   
    Key k;
    k.raw = (uint16_t)user_data;
    
+   PPG_LOG("umlautCB\n")
+   
+   // Note, as we might be dealing with one-shot shift, we cannot
+   // inject the keys (as one-shot does not deal with injected stuff)
+   //
    if(activation_flags & PPG_Action_Activation_Flags_Active) {
-      pressKey(RALT(k));
+      handleKeyswitchEvent(RALT(k), UNKNOWN_KEYSWITCH_LOCATION, IS_PRESSED/* | INJECTED*/);
    }
-   else {
-      releaseKey(RALT(k));
+   else {    
+      PPG_LOG("releasing umlaut\n") 
+      handleKeyswitchEvent(RALT(k), UNKNOWN_KEYSWITCH_LOCATION, WAS_PRESSED | INJECTED);
    }
 }
 
