@@ -20,6 +20,8 @@
 
 } // This ends region extern "C"
 
+#include <assert.h>
+
 // A note on the use of the __NL__ macro below:
 //
 //       Preprocessor macro functions can be 
@@ -49,18 +51,6 @@
 
 namespace kaleidoscope {
 namespace papageno {
-   
-// #define PPG_KLS_KEYPOS(ROW, COL, S___)                             
-//    S___(ROW, COL)
-//
-//#define PPG_KLS_INPUT_FROM_KEYPOS_CALL(ROW, COL)                       
-//    inputIdFromKeypos(ROW, COL)
-//    
-// #define PPG_KLS_INPUT_FROM_KEYPOS_ALIAS(KEYPOS_ALIAS)                          
-//    PPG_KLS_KEYPOS_INPUT(KEYPOS_ALIAS)
-//    
-// #define PPG_KLS_INPUT_FROM_ID(ID)                      
-//    PPG_##ID##_Keycode_Name
 
 // The inputs that are defined by Papageno in the firmware sketch
 // are mapped to a range of compile time constants whose value starts from 
@@ -95,27 +85,6 @@ int16_t highestKeyposInputId() {
 
 static constexpr unsigned PPG_Keycode_Input_Offset = __COUNTER__;
 
-#define PPG_KLS_DEFINE_KEYCODE_INPUT_ID(UNIQUE_ID, USER_ID)                                    \
-__NL__   static constexpr unsigned PPG_KLS_KEYCODE_INPUT(UNIQUE_ID)                   \
-__NL__      = PPG_Highest_Keypos_Input + (int16_t)(__COUNTER__) - PPG_Keycode_Input_Offset;
-
-GLS_INPUTS___KEYCODE(PPG_KLS_DEFINE_KEYCODE_INPUT_ID)
-
-#define PPG_KLS_DEFINE_COMPLEX_KEYCODE_INPUT_ID(UNIQUE_ID, USER_ID, KEYCODE)                   \
-            PPG_KLS_DEFINE_KEYCODE_INPUT_ID(UNIQUE_ID, 0 /*unused*/)
-
-GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_DEFINE_COMPLEX_KEYCODE_INPUT_ID)
-
-/* Attention! PPG_Highest_Keycode_Input may be negative in case that
-   no keypos and keycode inputs are defined
- */
-static constexpr unsigned PPG_Highest_Keycode_Input 
-   = PPG_Highest_Keypos_Input
-                 + (int16_t)(__COUNTER__) - PPG_Keypos_Input_Offset - 1;
-
-static_assert(PPG_Highest_Keycode_Input <= 255,
-   "The number of inputs exceeds the maximum possible number of 255");
-
 // To attach to Kaleidoscope's event handling, we 
 // need to be able to determine an input id from a keypos.
 //
@@ -136,29 +105,6 @@ __NL__      break;
    return PPG_KLS_Not_An_Input;
 }
 
-// To attach to Kaleidoscope's event handling, we 
-// need to be able to determine an input id from a keycode.
-//
-PPG_Input_Id inputIdFromKeycode(Key keycode)
-{
-   switch(keycode.raw) {
-
-#     define PPG_KLS_KEYCODE_CASE_LABEL(UNIQUE_ID, USER_ID)                                    \
-__NL__   case USER_ID.flags << 8 | USER_ID.keyCode:                                                         \
-__NL__      return PPG_KLS_KEYCODE_INPUT(UNIQUE_ID);                                  \
-__NL__      break;
-
-      GLS_INPUTS___KEYCODE(PPG_KLS_KEYCODE_CASE_LABEL)
-      
-#     define PPG_KLS_COMPLEX_KEYCODE_CASE_LABEL(UNIQUE_ID, USER_ID, KEYCODE)                   \
-         PPG_KLS_KEYCODE_CASE_LABEL(UNIQUE_ID, GLS_DEFER(USER_ID))
-         
-      GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_COMPLEX_KEYCODE_CASE_LABEL)
-   }
-
-   return PPG_KLS_Not_An_Input;
-}
-
 PPG_KLS_Keypos ppg_kls_keypos_lookup[] = {
 
 #  define PPG_KLS_KEYPOS_TO_LOOKUP_ENTRY(UNIQUE_ID, USER_ID, ROW, COL)                         \
@@ -169,26 +115,45 @@ PPG_KLS_Keypos ppg_kls_keypos_lookup[] = {
    { .row = 0xFF, .col = 0xFFL }
 };
 
-Key ppg_kls_keycode_lookup[] = {
-
-#  define PPG_KLS_CONVERT_TO_KEYCODE_ARRAY_ENTRY(UNIQUE_ID, USER_ID) USER_ID /* USER_ID is actually a keycode*/,
-      
-   GLS_INPUTS___KEYCODE(PPG_KLS_CONVERT_TO_KEYCODE_ARRAY_ENTRY)
-
-#  define PPG_KLS_CONVERT_COMPLEX_TO_KEYCODE_ARRAY_ENTRY(UNIQUE_ID, USER_ID, KEYCODE) KEYCODE,
-      
-   GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_CONVERT_COMPLEX_TO_KEYCODE_ARRAY_ENTRY)
-
-   (Key){ .raw = (uint16_t)-1}
-};
-
 #define PPG_KLS_ADD_ONE(...) + 1
 
 static constexpr unsigned PPG_KLS_N_Inputs = 0
    GLS_INPUTS___KEYPOS(PPG_KLS_ADD_ONE)
-   GLS_INPUTS___KEYCODE(PPG_KLS_ADD_ONE)
-   GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_ADD_ONE)
+//    GLS_INPUTS___KEYCODE(PPG_KLS_ADD_ONE)
+//    GLS_INPUTS___COMPLEX_KEYCODE(PPG_KLS_ADD_ONE)
 ;
+
+PPG_Bitfield_Storage_Type inputsBlockedBits[(GLS_NUM_BITS_LEFT(PPG_KLS_N_Inputs) != 0) ? (GLS_NUM_BYTES(PPG_KLS_N_Inputs) + 1) : GLS_NUM_BYTES(PPG_KLS_N_Inputs)]
+   = GLS_ZERO_INIT;
+   
+PPG_Bitfield inputsBlocked = { inputsBlockedBits, PPG_KLS_N_Inputs };
+   
+void blockInput(uint8_t inputId) {
+   ppg_bitfield_set_bit(&inputsBlocked, inputId, true);
+}
+
+void unblockInput(uint8_t inputId) {
+   ppg_bitfield_set_bit(&inputsBlocked, inputId, false);
+}
+
+bool isInputBlocked(uint8_t inputId) {
+   return ppg_bitfield_get_bit(&inputsBlocked, inputId);
+}
+
+// int8_t inputsBlocked[PPG_KLS_N_Inputs] = GLS_ZERO_INIT;
+// 
+// void blockInput(uint8_t inputId) {
+//    ++inputsBlocked[inputId];
+// }
+// 
+// void unblockInput(uint8_t inputId) {
+//    --inputsBlocked[inputId];
+//    assert(inputsBlocked[inputId] >= 0);
+// }
+// 
+// bool isInputBlocked(uint8_t inputId) {
+//    return inputsBlocked[inputId] > 0;
+// }
 
 } // namespace papageno
 } // namespace kaleidoscope

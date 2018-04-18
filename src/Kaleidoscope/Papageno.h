@@ -41,16 +41,21 @@ class Papageno : public KaleidoscopePlugin
       void begin() final;
       
       void init();
-            
+      
+      static void setEnabled(bool state);
+      static bool getEnabled();
+      
       // Some utility functions required by Papageno's API
       //
       static void processKeycode(PPG_Count activation_flags, void *user_data);
       static void processKeypos(PPG_Count activation_flags, void *user_data);
       
+      void loop();
+      
    private:
 
       static Key eventHandlerHook(Key mapped_key, byte row, byte col, uint8_t key_state);
-      static void loopHook(bool is_post_clear);
+//       static void loopHook(bool is_post_clear);
 };
 
 enum { PPG_KLS_Not_An_Input = (PPG_Input_Id)-1 };
@@ -58,10 +63,8 @@ enum { PPG_KLS_Not_An_Input = (PPG_Input_Id)-1 };
 // The following extern entities are initialized in Papageno-Initialization.h
 //
 extern PPG_KLS_Keypos ppg_kls_keypos_lookup[];
-extern Key ppg_kls_keycode_lookup[];
 
 extern PPG_Input_Id inputIdFromKeypos(byte row, byte col);
-extern PPG_Input_Id inputIdFromKeycode(Key keycode);
 
 extern int16_t highestKeyposInputId();
 
@@ -84,16 +87,11 @@ extern kaleidoscope::papageno::Papageno Papageno;
 #define PPG_KLS_KEYPOS_INPUT(UNIQUE_ID)                                               \
    PPG_KLS_TRICAT(PPG_, UNIQUE_ID, _Keypos_Name)
 
-#define PPG_KLS_KEYCODE_INPUT(UNIQUE_ID)                                               \
-   PPG_KLS_TRICAT(PPG_, UNIQUE_ID, _Keycode_Name)
-
 //##############################################################################
 // Definitions for Papageno's Glockenspiel compiler interface
 //##############################################################################
 
 #define GLS_ENABLE_INPUTS_LOCAL_INITIALIZATION___KEYPOS
-#define GLS_ENABLE_INPUTS_LOCAL_INITIALIZATION___KEYCODE
-#define GLS_ENABLE_INPUTS_LOCAL_INITIALIZATION___COMPLEX_KEYCODE
 
 // This macro is used by the Glockenspiel compiled code to initialize
 // keypos based inputs. It boils down to the name of a constexpr integer that
@@ -101,20 +99,6 @@ extern kaleidoscope::papageno::Papageno Papageno;
 //
 #define GLS_INPUT_INITIALIZE___KEYPOS(UNIQUE_ID, USER_ID, ROW, COL) \
    kaleidoscope::papageno::PPG_KLS_KEYPOS_INPUT(UNIQUE_ID)
-
-// This macro is used by the Glockenspiel compiled code to initialize
-// keycode based inputs. It boils down to the name of a constexpr integer that
-// references the input.
-//  
-#define GLS_INPUT_INITIALIZE___KEYCODE(UNIQUE_ID, USER_ID) \
-   kaleidoscope::papageno::PPG_KLS_KEYCODE_INPUT(UNIQUE_ID)
-
-// This macro is used by the Glockenspiel compiled code to initialize
-// keycode based inputs. It boils down to the name of a constexpr integer that
-// references the input.
-//  
-#define GLS_INPUT_INITIALIZE___COMPLEX_KEYCODE(UNIQUE_ID, USER_ID, KEYCODE) \
-   kaleidoscope::papageno::PPG_KLS_KEYCODE_INPUT(UNIQUE_ID)
    
 // Keycode actions are compile time constant and can thus already be
 // assigned when the global static Papageno search tree is initialized.
@@ -153,6 +137,7 @@ __NL__         __GLS_DI__(func) (PPG_Action_Callback_Fun)FUNC,                  
 __NL__         __GLS_DI__(user_data) USER_DATA                                     \
 __NL__      }                                                                  \
 __NL__   } 
+
 // A file that is included in the Glockenspiel-generated
 // representation of the Papageno tree just before any C/C++
 // stuff is defined. 
@@ -160,6 +145,11 @@ __NL__   }
 // with actions and inputs and their mapping to Kaleidoscope data.
 //
 #define GLS_GLOBAL_INITIALIZATION_INCLUDE "Kaleidoscope/Papageno-Initialization.h"
+
+// Use an artificial event queue size to make sure that there is enough
+// space for synthesized loop events.
+//
+// #define GLS_EVENT_QUEUE_SIZE(S) (2*(S))
 
 /*
 glockenspiel_begin
@@ -169,11 +159,6 @@ glockenspiel_begin
 
 % The names of KEYCODE inputs must match exactly the names of 
 % Kaleidoscope keycodes.
-
-% A simple keycode based input. No parameters need to be specified.
-% The name of the input must match one of Kaleidoscope's predefined keys.
-%
-input: Key_A <KEYCODE>
 
 % A complex keycode. Assign a unique name and pass the keycode specification
 % code between dollars (raw code).

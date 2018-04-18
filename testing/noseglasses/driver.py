@@ -49,12 +49,12 @@ class NoseglassesTest(TestDriver):
       self.rightThumb3 = (1, 8)
       self.rightThumb4 = (0, 8)
       
-      self.special1 = (0, 13)
-      self.special2 = (0, 15)
-      self.special3 = (0,  0)
-      self.special4 = (0,  1)
-      self.special5 = (0,  2)
-      self.special6 = (0,  3)
+      self.special1 = (2,  9)
+      self.special2 = (0,  9)
+      self.special3 = (0,  6)
+      self.special4 = (1,  6)
+      self.special5 = (2,  6)
+      self.special6 = (1,  9)
       
       self.ng_Key_E = (2,  3)
       self.ng_Key_O = (2, 13)
@@ -370,10 +370,18 @@ class NoseglassesTest(TestDriver):
       ])
       self.keyDown(*self.rightThumb2)
       self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
       self.keyDown(*self.ng_Key_A)
       self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
       self.keyUp(*self.ng_Key_A)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
       self.keyUp(*self.rightThumb2)
+      self.scanCycle()
       self.scanCycle()
       self.checkStatus()
       
@@ -454,10 +462,14 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportKeysActive([keyI()], exclusively = True),
          ReportAllModifiersInactive()
-      ])
+      ])     
       #self.queueGroupedReportAssertions([
-         #ReportEmpty()
+         #ReportKeysActive([keyI(), keyC()], exclusively = True),
+         #ReportAllModifiersInactive()
       #])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
       self.queueGroupedReportAssertions([
          ReportKeysActive([keyC()], exclusively = True),
          ReportAllModifiersInactive()
@@ -485,8 +497,12 @@ class NoseglassesTest(TestDriver):
          ReportAllModifiersInactive()
       ])
       #self.queueGroupedReportAssertions([
-         #ReportEmpty()
+         #ReportKeysActive([keyS(), keyC()], exclusively = True),
+         #ReportAllModifiersInactive()
       #])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
       self.queueGroupedReportAssertions([
          ReportKeysActive([keyC()], exclusively = True),
          ReportAllModifiersInactive()
@@ -670,8 +686,13 @@ class NoseglassesTest(TestDriver):
       ])
       
       self.queueGroupedReportAssertions([
-         ReportEmpty()
+         ReportKeysActive([keyS(), keyE()], exclusively = True),
+         ReportAllModifiersInactive()
       ])
+      
+      #self.queueGroupedReportAssertions([
+         #ReportEmpty()
+      #])
       
       self.queueGroupedReportAssertions([
          ReportKeysActive([keyE()], exclusively = True),
@@ -700,6 +721,104 @@ class NoseglassesTest(TestDriver):
       self.scanCycle()
       self.scanCycle()
       self.scanCycle()
+      self.skipTime(500)
+      self.checkStatus()
+         
+   def test27(self):
+
+      self.header("e, a")
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyE()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])     
+      #self.queueGroupedReportAssertions([
+         #ReportKeysActive([keyI(), keyC()], exclusively = True),
+         #ReportAllModifiersInactive()
+      #])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyA()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.keyTap(self.ng_Key_E)
+      self.keyTap(self.ng_Key_A)
+      
+      self.checkStatus()
+
+   def test28(self):
+
+      self.header("e, a - 2")
+      
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyE()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])     
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyE(), keyA()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      #self.queueGroupedReportAssertions([
+         #ReportEmpty()
+      #])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyA()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])   
+            
+      self.keyDown(*self.ng_Key_E)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      #self.skipTime(500)
+      self.keyDown(*self.ng_Key_A)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.keyUp(*self.ng_Key_E)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.skipTime(500)
+      self.keyUp(*self.ng_Key_A)
+      self.scanCycle()
+      self.scanCycle()
+      self.scanCycle()
+      self.skipTime(500)
+      self.checkStatus()
+      
+   def test29(self):
+      
+      self.header("Double s with timeout")
+      
+      # A held double-s should cause the tap timeout to expire 
+      # and result in a sequence of s being send
+      #
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyS()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyS()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      # Key s will be kept held
+      self.keyTap(self.ng_Key_S)
+      self.keyTap(self.ng_Key_S)
+      
       self.skipTime(500)
       self.checkStatus()
       
@@ -731,6 +850,9 @@ class NoseglassesTest(TestDriver):
       self.test24()
       self.test25()
       self.test26()
+      self.test27()
+      self.test28()
+      self.test29()
       
 def main():
     
