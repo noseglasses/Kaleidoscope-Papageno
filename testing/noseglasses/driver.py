@@ -21,18 +21,34 @@ import leidokos
 from leidokos import *
 
 class NoseglassesTest(TestDriver):
-
-   def keyTap(self, key):
+   
+   def keyDownWait(self, key_name):
+      
+      self.log("Pressing key %s" % key_name)
+      
+      key = getattr(self, key_name)
             
       self.keyDown(*key)
       self.scanCycle()
       self.scanCycle()
       self.scanCycle()
+      
+   def keyUpWait(self, key_name):
+            
+      self.log("Releasing key %s" % key_name)
+      
+      key = getattr(self, key_name)
+      
       self.keyUp(*key)
       self.scanCycle()
       self.scanCycle()
       self.scanCycle()
 
+   def keyTap(self, key):
+            
+      self.keyDownWait(key)
+      self.keyUpWait(key)
+      
    def run(self):
       
       self.description(
@@ -66,6 +82,8 @@ class NoseglassesTest(TestDriver):
       self.ng_Key_X = (3,  2)
       self.ng_Key_Z = (3,  1)
             
+      self.ng_Key_Quote = (3, 13)
+            
       self.errorIfReportWithoutQueuedAssertions = True
       
       self.addPermanentReportAssertions([ 
@@ -86,8 +104,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.leftThumb3)
-      self.keyTap(self.rightThumb2)
+      self.keyTap("leftThumb3")
+      self.keyTap("rightThumb2")
       self.checkStatus()
 
    def test2(self):
@@ -108,8 +126,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.leftThumb3)
-      self.keyTap(self.leftThumb3)
+      self.keyTap("leftThumb3")
+      self.keyTap("leftThumb3")
       self.checkStatus()
       
    def test3(self):
@@ -124,8 +142,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.leftThumb3)
-      self.keyTap(self.rightThumb3)
+      self.keyTap("leftThumb3")
+      self.keyTap("rightThumb3")
       self.checkStatus()
 
    def test4(self):
@@ -141,8 +159,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.rightThumb2)
-      self.keyTap(self.rightThumb2)
+      self.keyTap("rightThumb2")
+      self.keyTap("rightThumb2")
       self.checkStatus()
       
    def test5(self):
@@ -157,8 +175,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.rightThumb2)
-      self.keyTap(self.leftThumb2)
+      self.keyTap("rightThumb2")
+      self.keyTap("leftThumb2")
       self.checkStatus()
 
    def test6(self):
@@ -177,8 +195,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.special1)
-      self.keyTap(self.special1)
+      self.keyTap("special1")
+      self.keyTap("special1")
       self.checkStatus()
       
    def test7(self):
@@ -202,8 +220,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.special3)
-      self.keyTap(self.special3)
+      self.keyTap("special3")
+      self.keyTap("special3")
       self.skipTime(500) # Enable timeout
       self.checkStatus()
       
@@ -224,9 +242,9 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.special3)
-      self.keyTap(self.special3)
-      self.keyTap(self.special3)
+      self.keyTap("special3")
+      self.keyTap("special3")
+      self.keyTap("special3")
       self.checkStatus()
 
    def test9(self):
@@ -242,8 +260,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.special4)
-      self.keyTap(self.special4)
+      self.keyTap("special4")
+      self.keyTap("special4")
       self.checkStatus()
       
    def test10(self):
@@ -258,8 +276,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.special5)
-      self.keyTap(self.special5)
+      self.keyTap("special5")
+      self.keyTap("special5")
       self.checkStatus()
       
    def test11(self):
@@ -275,8 +293,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.special6)
-      self.keyTap(self.special6)
+      self.keyTap("special6")
+      self.keyTap("special6")
       self.checkStatus()
 
    def test12(self):
@@ -303,9 +321,9 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.ng_Key_E)
-      self.keyTap(self.ng_Key_E)
-      self.keyTap(self.ng_Key_E)
+      self.keyTap("ng_Key_E")
+      self.keyTap("ng_Key_E")
+      self.keyTap("ng_Key_E")
       self.checkStatus()
       
    def test13(self):
@@ -319,9 +337,9 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.ng_Key_O)
-      self.keyTap(self.ng_Key_O)
-      self.keyTap(self.ng_Key_O)
+      self.keyTap("ng_Key_O")
+      self.keyTap("ng_Key_O")
+      self.keyTap("ng_Key_O")
       self.checkStatus()
       
    def test14(self):
@@ -335,9 +353,9 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.ng_Key_I)
-      self.keyTap(self.ng_Key_I)
-      self.keyTap(self.ng_Key_I)
+      self.keyTap("ng_Key_I")
+      self.keyTap("ng_Key_I")
+      self.keyTap("ng_Key_I")
       self.checkStatus()
       
    def test15(self):
@@ -351,9 +369,9 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.ng_Key_S)
-      self.keyTap(self.ng_Key_S)
-      self.keyTap(self.ng_Key_S)
+      self.keyTap("ng_Key_S")
+      self.keyTap("ng_Key_S")
+      self.keyTap("ng_Key_S")
       self.checkStatus()
       
    def test16(self):
@@ -368,21 +386,10 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyDown(*self.rightThumb2)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyDown(*self.ng_Key_A)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.ng_Key_A)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.rightThumb2)
-      self.scanCycle()
-      self.scanCycle()
+      self.keyDownWait("rightThumb2")
+      self.keyDownWait("ng_Key_A")
+      self.keyUpWait("ng_Key_A")
+      self.keyUpWait("rightThumb2")
       self.checkStatus()
       
    def test17(self):
@@ -395,22 +402,10 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyDown(*self.rightThumb2)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.rightThumb2)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyDown(*self.ng_Key_A)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.ng_Key_A)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
+      self.keyDownWait("rightThumb2")
+      self.keyUpWait("rightThumb2")
+      self.keyDownWait("ng_Key_A")
+      self.keyUpWait("ng_Key_A")
       self.checkStatus()
 
    def test18(self):
@@ -438,22 +433,10 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyDown(*self.leftThumb3)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.leftThumb3)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyDown(*self.ng_Key_A)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.ng_Key_A)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
+      self.keyDownWait("leftThumb3")
+      self.keyUpWait("leftThumb3")
+      self.keyDownWait("ng_Key_A")
+      self.keyUpWait("ng_Key_A")
       self.checkStatus()
       
    def test19(self):
@@ -477,8 +460,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.ng_Key_I)
-      self.keyTap(self.ng_Key_C)
+      self.keyTap("ng_Key_I")
+      self.keyTap("ng_Key_C")
       
       self.checkStatus()
       
@@ -510,9 +493,9 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.ng_Key_I)
-      self.keyTap(self.ng_Key_S)
-      self.keyTap(self.ng_Key_C)
+      self.keyTap("ng_Key_I")
+      self.keyTap("ng_Key_S")
+      self.keyTap("ng_Key_C")
       
       self.checkStatus()
       
@@ -535,7 +518,7 @@ class NoseglassesTest(TestDriver):
          ReportAllModifiersInactive()
       ])
       # Key s will be kept held
-      self.keyTap(self.ng_Key_S)
+      self.keyTap("ng_Key_S")
       self.keyDown(*self.ng_Key_S)
       
       self.skipTime(500)
@@ -590,12 +573,12 @@ class NoseglassesTest(TestDriver):
          ReportEmpty()
       ])
       
-      self.keyTap(self.leftThumb3)
-      self.keyTap(self.ng_Key_I)
-      self.keyTap(self.ng_Key_I)
-      self.keyTap(self.ng_Key_I)
+      self.keyTap("leftThumb3")
+      self.keyTap("ng_Key_I")
+      self.keyTap("ng_Key_I")
+      self.keyTap("ng_Key_I")
       
-      self.keyTap(self.ng_Key_I)
+      self.keyTap("ng_Key_I")
       
       self.skipTime(500)
       self.checkStatus()
@@ -623,23 +606,10 @@ class NoseglassesTest(TestDriver):
          ReportEmpty()
       ])
       
-      self.keyDown(*self.leftThumb3)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      #self.skipTime(500)
-      self.keyDown(*self.ng_Key_C)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.leftThumb3)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.ng_Key_C)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
+      self.keyDownWait("leftThumb3")
+      self.keyDownWait("ng_Key_C")
+      self.keyUpWait("leftThumb3")
+      self.keyUpWait("ng_Key_C")
       self.checkStatus()
       
    def test24(self):
@@ -655,7 +625,7 @@ class NoseglassesTest(TestDriver):
          ReportEmpty()
       ])
       
-      self.keyTap(self.ng_Key_X);
+      self.keyTap("ng_Key_X");
       
       self.checkStatus()
    
@@ -672,7 +642,7 @@ class NoseglassesTest(TestDriver):
          ReportEmpty()
       ])
       
-      self.keyTap(self.ng_Key_Z);
+      self.keyTap("ng_Key_Z");
       
       self.checkStatus()
       
@@ -703,24 +673,12 @@ class NoseglassesTest(TestDriver):
          ReportEmpty()
       ])
       
-      self.keyDown(*self.ng_Key_S)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
+      self.keyDownWait("ng_Key_S")
       #self.skipTime(500)
-      self.keyDown(*self.ng_Key_E)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.ng_Key_S)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
+      self.keyDownWait("ng_Key_E")
+      self.keyUpWait("ng_Key_S")
       self.skipTime(500)
-      self.keyUp(*self.ng_Key_E)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
+      self.keyUpWait("ng_Key_E")
       self.skipTime(500)
       self.checkStatus()
          
@@ -745,8 +703,8 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      self.keyTap(self.ng_Key_E)
-      self.keyTap(self.ng_Key_A)
+      self.keyTap("ng_Key_E")
+      self.keyTap("ng_Key_A")
       
       self.checkStatus()
 
@@ -773,24 +731,12 @@ class NoseglassesTest(TestDriver):
          ReportEmpty()
       ])   
             
-      self.keyDown(*self.ng_Key_E)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
+      self.keyDownWait("ng_Key_E")
       #self.skipTime(500)
-      self.keyDown(*self.ng_Key_A)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
-      self.keyUp(*self.ng_Key_E)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
+      self.keyDownWait("ng_Key_A")
+      self.keyUpWait("ng_Key_E")
       self.skipTime(500)
-      self.keyUp(*self.ng_Key_A)
-      self.scanCycle()
-      self.scanCycle()
-      self.scanCycle()
+      self.keyUpWait("ng_Key_A")
       self.skipTime(500)
       self.checkStatus()
       
@@ -815,11 +761,47 @@ class NoseglassesTest(TestDriver):
       self.queueGroupedReportAssertions([
          ReportEmpty()
       ])
-      # Key s will be kept held
-      self.keyTap(self.ng_Key_S)
-      self.keyTap(self.ng_Key_S)
+      self.keyTap("ng_Key_S")
+      self.keyTap("ng_Key_S")
       
       self.skipTime(500)
+      self.checkStatus()
+      
+   def test30(self):
+      
+      self.header("'sx")
+      
+      # A held double-s should cause the tap timeout to expire 
+      # and result in a sequence of s being send
+      #
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyQuote()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyS()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyX()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.keyDownWait("rightThumb2")
+      self.keyDownWait("ng_Key_Quote")
+      self.keyUpWait("rightThumb2")
+      self.keyDownWait("ng_Key_S")
+      self.keyUpWait("ng_Key_S")
+      self.keyUpWait("ng_Key_Quote")
+      self.keyTap("ng_Key_X")
       self.checkStatus()
       
    def runTestSeries(self):
@@ -853,6 +835,7 @@ class NoseglassesTest(TestDriver):
       self.test27()
       self.test28()
       self.test29()
+      self.test30()
       
 def main():
     

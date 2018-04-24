@@ -161,9 +161,9 @@ static void processEventCallback(
                         ppg_kls_keypos_lookup[event->input].col,
                         keyState);
    
-      Kaleidoscope.preClearLoopHooks();
-      kaleidoscope::hid::sendKeyboardReport();
-      Kaleidoscope.postClearLoopHooks();
+//       Kaleidoscope.preClearLoopHooks();
+//       kaleidoscope::hid::sendKeyboardReport();
+//       Kaleidoscope.postClearLoopHooks();
    
    ++papageno::eventsFlushed_;
 }
@@ -282,6 +282,13 @@ static Key eventHandlerHook(Key keycode, byte row, byte col, uint8_t key_state)
    uint8_t input = inputIdFromKeypos(row, col);
    
    if(input == PPG_KLS_Not_An_Input) { 
+      
+      // Only interrupt pattern recognition if 
+      // unrelated (non input) keys are pressed (rather than release)
+      //
+      if(flags != PPG_Event_Active) {
+         return keycode;
+      }
          
 //          PPG_LOG("not an input\n");
       
@@ -415,6 +422,9 @@ void
    Papageno
       ::init()
 {
+   Kaleidoscope.setKeyboardReportSendPolicy(
+         kaleidoscope::KeyboardReportSendOnEvent);
+   
    ppg_global_set_default_event_processor(
       (PPG_Event_Processor_Fun)kaleidoscope::papageno::processEventCallback);
 

@@ -86,6 +86,12 @@ extern kaleidoscope::papageno::Papageno Papageno;
 
 #define PPG_KLS_KEYPOS_INPUT(UNIQUE_ID)                                               \
    PPG_KLS_TRICAT(PPG_, UNIQUE_ID, _Keypos_Name)
+   
+#define PPG_CALLBACK_NO_REPEAT \
+   if(activation_flags & PPG_Action_Activation_Flags_Repeated) { return; }
+   
+#define PPG_CALLBACK_ONLY_ACTIVATION \
+   if(!(activation_flags & PPG_Action_Activation_Flags_Active)) { return; }
 
 //##############################################################################
 // Definitions for Papageno's Glockenspiel compiler interface
@@ -213,7 +219,7 @@ glockenspiel_end
 // which is caused by defining macro KALEIDOSCOPE_PAPAGENO_POSTPONE_INITIALIZATION
 // before this header is included.
 //
-#ifndef KALEIDOSCOPE_PAPAGENO_POSTPONE_INITIALIZATION
+#ifndef KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS
 extern "C" {
 #include "Kaleidoscope-Papageno-Sketch.hpp"
 }
