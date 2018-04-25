@@ -11,15 +11,15 @@
 
 #### Turn your keyboard into a magical instrument!
 
-Define multi-key tap-dances (key-sequences), chords, key-clusters, leader sequences a mixture of it all. [Papageno](https://github.com/noseglasses/papageno/) an advanced pattern matching library seamlessly integrates with Kaleidoscope to provide ultimate flexibility in the generation of multi-key gestures/key patterns. An automatized compile-based compression mechanism converts key-patterns to C/C++ code that represents an optimized, statically allocated search tree. Key patterns are specified directly in the firmware sketch, written in an easy to use domain specific language.
+Define multi-key tap-dances (key-sequences), chords, key-clusters, leader sequences or a mixture of it all. Via this plugin, [Papageno](https://github.com/noseglasses/papageno/) an advanced pattern matching library seamlessly integrates with Kaleidoscope to provide ultimate flexibility in the generation of multi-key gestures/key patterns. An automatized compile-based compression mechanism converts key-patterns to C/C++ code that represents an optimized, statically allocated search tree. Key patterns are specified directly in the firmware sketch, written in an easy to use domain specific language.
 
 #### Table of Contents
 
 [Motivation](#Motivation)<br>
-[Papageno - a pattern matching library](#Papageno - a pattern matching library)<br>
+[Papageno - a pattern matching library](#Papageno)<br>
 [Prerequisites](#Prerequisites)<br>
-[Preparing the sketch](#Preparing the sketch)<br>
-[Building the plugin](#Building the plugin)
+[Preparing the sketch](#Preparing_the_sketch)<br>
+[Building the plugin](#Building_the_plugin)
 
 ## Motivation
 
@@ -27,93 +27,84 @@ Define multi-key tap-dances (key-sequences), chords, key-clusters, leader sequen
 
 While typing on traditional keyboards, the thumbs are chronically under-utilized. Most modern ergonomic keyboards therefore come with dedicated thumb key clusters.
 As our thumbs are the most powerful fingers, it is desirable to shift as much work as possible from the other fingers to the thumbs. The actual number of (reachable) thumb keys varies among different keyboard designs. Typically, there are between four and eight (reachable) programmable thumb keys available.
-This restricted number of keys means that with traditional key-codes the amount of different functions that can be triggered by hitting thumb keys is quite limited.
-In the recent past there emerged quite a number of innovative ideas that aim to assign more than two key-codes or actions to a physical key.
+Due to this restricted number, the amount of different functions that can be triggered by assigning traditional key-codes is quite limited.
+In the recent years quite a number of innovative ideas emerged that all aim to assign more than two key-codes or actions to one physical key. Kaleidoscope-Papageno reinterprets some of these ideas to provide new unique functionality.
 
 ### Existing Kaleidoscope-features
 
-Using Kaleidoscope, tap-dances, modifier keys, with and without one-touch, as well as multiple key-map-layers provide different ways to creatively assign work to thumb keys. Every one of these methods has its specific advantages and downsides. A thorough analysis of the many possible ways to combine those features could fill an entire research article of its own. Therefore, we will concentrate on tap-dances to explain the enhancements introduced by Papageno.
+Kaleidoscope already provides different means to assign additional functionality to a single key, e.g. tap-dances, modifier keys, with and without one-touch, as well as the use of multiple key-map-layers. Every one of these methods has its specific advantages and downsides. A thorough analysis of the many possible ways to combine those features could fill entire research articles. We will, thus, concentrate on tap-dances to explain the enhancements introduced by Kaleidoscope-Papageno.
 
-Tap-dances theoretically allow to assign an infinite number of meanings to a single physical key. A certain number of key-presses, usually entered in rapid succession, triggers a specific action.
-This is probably the only, but also the greatest disadvantage of *traditional* tap-dances. Hitting a key an exact number of times in a row can be fairly difficult to accomplish, especially for non pianists and when there are action definitions for say, three, four and five strokes of the same key.
+[Tap-dances](https://github.com/keyboardio/Kaleidoscope-TapDance) theoretically allow to assign an infinite number of different actions to a single physical key. A certain number of key-presses, usually entered in rapid succession, triggers a specific action.
+Although very flexible, tap-dances come with on disadvantage. Hitting a key an exact number of times in a row can be fairly difficult to accomplish, especially for non pianists and when there are different actions assigned to say, three, four and five strokes of the same key.
 
 ### Towards multi-key tap-dances
 
-As a keyboard comes with a multitude of keys, why not extend the concept of tap-dances to combinations of several keys? It is much easier to hit two, three or more keys in a defined order than to hit the same key a given number of times. Isn't entering key sequences, i.e. words precisely what typists are trained to do?
+As a keyboard comes with a multitude of keys, why not extend the concept of tap-dances to combinations of several keys? It is much easier to hit two, three or more different keys in a defined order than it is to hit the same key a given number of times. Isn't typing key sequences, i.e. words precisely what typists are trained to do?
 
 ### Some numbers
 
-Let's return to our initial motivation, shifting work to thumb keys. A basic idea could be to assign actions to two-key combinations (two key words) of thumb keys that are assigned to the left and the right hand.
-For a keyboard with two thumb keys for each hand, this would mean that we would end up with eight possible two-key combinations of thumb keys assigned to different hands. Hereby, we assume that hitting two keys A and B in two different orders is supposed to trigger two different actions.
+Let's return to our initial motivation, shifting work to thumb keys. A basic idea could be to assign actions to two-key combinations of thumb keys, always one key of the left and one key of the right hand.
+For a keyboard with two thumb keys for each hand, this would mean that we would end up with eight possible two-key combinations. Hereby, we assume that hitting two keys A and B in two different orders is supposed to trigger two different actions.
 
-If we add to these eight combinations the four possible actions assigned to keys when hit independently, this sums up to twelve different actions for only four thumb keys.
+If we add to these eight combinations the four possible actions assigned to the keys when hit alone, this sums up to twelve different actions for only four thumb keys.
 
-It is up to the reader to solve the task of computing the drastic increase in number if we would also consider three-key combinations and so forth. And three key combinations are still easily doable.
+The number of possible actions drastically increases if we also consider three-key combinations and so forth. Even if it sounds complex at this point - three key combinations are absolutely doable.
 
 ### A real-life use case
 
 Let's look at a brief example how multi-key tap-dances/sequences (in Papageno jargon called single-note lines, clusters and chords) could be applied to enhance Kaleidoscope's capability.
 
-Imagine editing some sort of program source code. Hereby, a common task is to indent lines, either to improve readability or because the language requires indentation as part of its semantic (Python). Often it is also necessary to un-indent lines of code. Most editors assign shortcuts to both operations that are more or less simple to enter.
-As indentation/un-indentation are performed quite frequently when programming, it appears to be a good idea to trigger them by using thumb-keys.
+Imagine, you edit some sort of program source code. It is hereby a common task is to indent/un-indent lines. Most editors assign shortcuts to both operations that are more or less easy to trigger.
+As indentation/un-indentation are performed quite frequently when programming, why not assign them to our thumb keys?
 
-In the following we use the letter `A` for one of the left hand thumb-keys and `B` for one of the right hand thumb keys.
+In the following, letter `A` represents one of the left hand thumb-keys and `B` one of the right hand thumb keys.
 One possible solution for the given task would be to add indent
- when keys `A` and `B` are hit in order `A-B` and un-indent when hit in order `B-A`. Both operations would, of course, be programmed to emit the dedicated shortcut.
+ when keys `A` and `B` are hit in order `A-B` and remove indent when hit in order `B-A`.
 
-From a neuromuscular point of view this key-assignment strategy is doubtlessly a good choice as it is fairly easy to learn. Moreover, it is rather intuitive as we assign a forward-backward relation to indentation and un-indentation with respect to the order of the two thumb keys being hit. This certainly aids memorizing our new key assignment.
+From a neuromuscular point of view this task-assignment strategy is doubtlessly a good choice as both gestures are fairly easy to learn. It is that intuitive, because we assign a forward-backward relation to indentation and un-indentation with respect to the order of the two thumb keys being hit. This certainly aids memorizing our new shortcut-key assignment.
 
-## Papageno - a pattern matching library
+## <a name="Papageno"></a>Papageno - a pattern matching library
 
-To bring the above example to life, we need a mechanism that is capable to recognize more or less complex keystroke patterns. The requirements described, among others,
-led to the development of [Papageno](https://github.com/noseglasses/papageno/), an advanced pattern matching library. Originally implemented as part of Kaleidoscope, Papageno emerged to a stand-alone multi-platform library that via this plugin seamlessly integrates with Kaleidoscope. It provides a variety of different ways to define patterns that go far beyond advanced tap-dances only.
-
-### Papageno as a Kaleidoscope plugin
-
-Papageno allows for the definition of general multi-key patterns. All of the different patterns that are supported the same efficient and optimized pattern matching algorithm.
-
-The heart of Papageno is a search tree that is established based on the definitions that are added to the firmware sketch file and compiled by Papageno's Glockenspiel compiler.
+To bring the above example to life, we need a mechanism that is capable to recognize more or less complex keystroke patterns. The requirements described above, were the initial motivation of the advanced pattern matching library [Papageno](https://github.com/noseglasses/papageno/). It provides a variety of different ways to define patterns that go far beyond advanced tap-dances only.
 
 ### Compatibility with existing Kaleidoscope features
 
-The efficiency of Papageno's tree based pattern matching approach is one of the reasons why some features that were already part of Kaleidoscope, such as tap-dances and leader sequences, have been incorporated into Papageno \[Another reason is that they were just fun to implement based on Papageno ;-)\].
+The efficiency of Papageno's tree based pattern matching approach is one of the reasons why some features that were already part of Kaleidoscope, such as tap-dances and leader sequences, have been incorporated into Papageno \[Another reason is that they were just fun to implement ;-) \].
 
-If features provided by Papageno are used in common with equivalent pre-existing Kaleidoscope-features, such as e.g. tap dances, resource usage can expected to be significantly higher than if Papageno would deal with the detection of tap dances alone. The reason is obvious: more program memory and probably more RAM is required to store binary code and variables for two or more plugins instead of just one.
+If features provided by Papageno are used in common with other Kaleidoscope plugins, such as e.g. tap dances, resource usage can expected to be significantly higher than if Papageno would deal with the detection of tap dances alone. The reason is obvious: more program memory and probably more RAM is required to store binary code and variables for two or more plugins instead of just one.
 
 Although optimized resource utilization is never a bad idea, Papageno plays along well with other Kaleidoscope features. Stock plugins that have been found to work well with Kaleidoscope-Papageno are
 
-* Kaleidoscope-OneShot
+* Kaleidoscope-OneShot.
 
-If a plugin is not (yet) listed, this doesn't mean that it does not play along with Kaleidoscope-Papageno but simply that it has not been tested.
+If a plugin is not listed above, this doesn't mean that it is incompatible with Kaleidoscope-Papageno but simply that it has not been tested yet.
 If a plugin is found to be incompatible, I will list it here as well.
 
-Please feel free to generate issue reports when you encounter any incompatibilities with other plugins.
+Please feel free to submit issue reports when you encounter any incompatibilities with other plugins - and also if you are sure about an an explicit compatibility. Both will be listed here to inform other users.
 
 ### Papageno as a wrapper to Kaleidoscope
 
-Papageno-Kaleidoscope is designed as a wrapper for the rest of Kaleidoscope. Any keystrokes are intercepted and passed through Papageno's pattern matching engine. Only if a series of keystrokes is identified as not being part of any defined pattern, it is passed back to the main Kaleidoscope engine and, thus, to other plugins.
-
-This allows for a strong decoupling of Papageno and Kaleidoscope, which is robust and can be expected to cooperate quite well with most other Kaleidoscope plugins.
+Papageno-Kaleidoscope is currently designed to be a wrapper for the rest of Kaleidoscope. It intercepts some keystrokes and passes them through Papageno's pattern matching engine. Only if a of keystrokes is identified as not being part of any defined pattern, it is passed through to the Kaleidoscope core, and thus, to other plugins.
 
 For compatibility reasons, Papageno provides a layer mechanism that is fairly similar to that of Kaleidoscope's layered key-maps. At their point of definition, patterns are associated with layers. They are only active while their associated layer is the currently highest Kaleidoscope layer.
 Layer fall through (see Papageno's documentation), works similar to the assignment of transparent key-codes in Kaleidoscope key-maps.
 
-It is most common to emit Kaleidoscope key-codes or key-events (matrix row/column) when a defined pattern matches a series of keystrokes.
-To allow for more advanced functionality, Papageno provides arbitrary user callback functions to be used as actions which, to enable further customization, can be supplied with user defined data.
+It is most common to emit Kaleidoscope key-codes or key-events (matrix row/column) when a defined pattern matches a series of keystrokes. Papageno also allows arbitrary user callback functions to be used as actions, which can be supplied with user defined data to enable further customization.
 
 ## Prerequisites
 
-As Kaleidoscope-Papageno builds and uses the *Glockenspiel* compiler that is part of the Papageno project, it requires extended build steps
-to be carried out. Such build steps can currently not be incorporated in the stock build system (Kaleidoscope-Builder). This is why Kaleidoscope-Papageno relies on [Leidokos-CMake](https://github.com/CapeLeidokos/Leidokos-CMake) as its current build system.
+As Kaleidoscope-Papageno uses the *Glockenspiel* compiler that is build as part of the Papageno project, it requires extended build steps. Such extended build steps can currently not be incorporated in the stock build system Kaleidoscope-Builder. This is why Kaleidoscope-Papageno must rely on [Leidokos-CMake](https://github.com/CapeLeidokos/Leidokos-CMake) as its current build system.
 
-## Preparing the sketch
+## <a name="Preparing_the_sketch"></a>Preparing the sketch
 
-To use Kaleidoscope-Papageno in your firmware, include its main header at
+To use Kaleidoscope-Papageno with your firmware, you have to add some definition to your sketch file. Some of these definitions are probably nothing new to you as they are similar to what needs to be added bring in any other Kaleidoscope plugin. Other changes of the sketch, such as adding Papageno pattern definitions require some more explanations that will be provided in the following.
+
+To use Kaleidoscope-Papageno in your firmware, first include its main header at
 the top of your sketch.
 ```cpp
 #include "Kaleidoscope-Papageno.h"
 ```
-If you are going to define user function for customized actions, you need to define the pre-processor macro `KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS` before you include the main header. Explanations about what an action will follow.
+If you are going to define user functions to trigger custom actions, you need to define the pre-processor macro `KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS` before you include the main header. We will learn soon, what a user function action is.
 
 ```cpp
 #define KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS
@@ -121,7 +112,7 @@ If you are going to define user function for customized actions, you need to def
 ```
 
 Kaleidoscope-Papageno is somewhat special, compared to other Kaleidoscope plugins, as it
-needs to be the first in the list of plugins that are passed to `Kaleidoscope.use(...)`.
+needs to be the first in the list of plugins that are passed to `Kaleidoscope.use(...)` in Arduino's `setup()` function.
 
 ```cpp
 void setup() {
@@ -131,16 +122,17 @@ void setup() {
 
   // Register plugins.
   Kaleidoscope.use(
-    &Papageno
+    &Papageno // Let Papageno appear as first plugin
     // ... other plugins
   )
 }
 ```
 
-The order in which the plugins are registered with `Kaleidoscope.use(...)`
-decides on the order the plugins are internally called by Kaleidoscope's core. to be on the safe side, it is important to let Kaleidoscope-Papageno to come first.
+Explanation: The order in which the plugins are registered with `Kaleidoscope.use(...)`
+decides on the order the plugins are internally called by Kaleidoscope's core, e.g. when processing keyboard events.
+
 There might be other plugins for which it is necessary to be processed before
-Kaleidoscope-Papageno. Just play with the order and see what happens.
+Kaleidoscope-Papageno. Just play with the order you add the plugins to `Kaleidoscope.use(...)` and see what happens.
 
 Another difference to other plugins is that Kaleidoscope-Papageno comes
 with its own `loop()` method. This must be called instead of Kaleidoscope's default
@@ -152,7 +144,7 @@ void loop() {
 }
 ```
 
-If you defined the macro `KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS`
+Finally, if you defined the macro `KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS`
 before including `Kaleidoscope-Papageno.h`, you need to add a small amount
 of boiler plate code to the very end of your sketch file, namely
 
@@ -163,19 +155,21 @@ extern "C" {
 ```
 
 This ensures that the C/C++ code that is generated by Glockenspiel, based on the pattern definitions in the sketch, is
-included after the definitions of any user functions that are supposed to serve as pattern actions. This is important as
+included __after__ the definitions of any user functions that are supposed to serve as pattern actions. This is important as
 such user functions would otherwise be reported as "undefined symbols"
 when compiling the firmware.
 
+Now you are almost done with preparing the sketch. The only thing that's
+missing is the definition of Papageno patterns.
+
 ### Defining Papageno patterns
 
-The definition of patterns is based on a domain specific language that is converted to a highly efficient C/C++ code
-by the Glockenspiel compiler. Pattern definitions can be added directly to the Kaleidoscope sketch either in a commented region
+The definition of patterns is written in Papageno/Glockenspiel's own domain specific language that it converts to highly efficient C/C++ code during the compile. Pattern definitions are added directly to the Kaleidoscope sketch either in a commented region
 ```cpp
 /* Papageno definitions follow
 
 glockenspiel_begin
-...
+... patterns go here ...
 glockenspiel_end
 */
 ```
@@ -186,70 +180,81 @@ or surrounded by `#if 0 ... #endif`.
 Papageno definitions follow
 
 glockenspiel_begin
-...
+... patterns go here ...
 glockenspiel_end
 #endif
 ```
 All Papageno definitions must be surrounded by `glockenspiel_begin` and
-`glockenspiel_end` as starting and ending tags to enable the Glockenspiel compiler to distinguish between Papageno definitions and C++ code.
+`glockenspiel_end` as starting and ending tags to enable the Glockenspiel compiler to distinguish between Papageno definitions and the sketch's remaining C++ code.
 
-Papageno definitions may occur at any place in the sketch. Only one block of Papageno definitions is allowed.
+Papageno definitions may occur at any place in the sketch, but only one `glockenspiel_begin ... glockenspiel_end` block is allowed.
 
 ### Comments in Papageno/Glockenspiel code
 Everything that follows a `%` until the end of a line is considered part of the comment.
 ```
+/*
 glockenspiel_begin
 
 % This is a comment.
 input: an_input <KEYPOS> = $ 1, 3 $ % This is a commented input.
 
 glockenspiel_end
+*/
 ```
 
 ### Defining inputs
 
-Kaleidoscope-Papageno checks keyboard input and tries to recognize patterns.
+Kaleidoscope-Papageno checks your keyboard input and attempts to recognize patterns while you are typing.
 For improved performance of pattern matching, only keys that are explicitly
-registered with Papageno may be part of patterns. Keys are thereby defined by their position (row/column) in the keyboard matrix. In Papageno jargon, keys that participate in pattern matching are called *inputs*. One can define as much as 255 separate inputs. In reality it depends on the number of keys of the keyboard, how many different inputs actually make sense. The maximum amount is the number of different physical keys.
+registered with Papageno may be part of such patterns. Keys are thereby defined by their position (row/column) in the keyboard matrix. In Papageno jargon, keys that participate in pattern matching are called *inputs*. In theory, one can define as much as 255 separate inputs with Kaleidoscope-Papageno. In reality, how many different inputs actually make sense, depends on the actual number of keys on the keyboard. The maximum amount of usable inputs is limited by the number of different physical keys.
 
-All the following examples assume a Keyboardio Model01 keyboard.
+Arduino hackers: In theory it is possible to attach other devices to the Arduino board that could serve as extended inputs. Currently this is not supported by Kaleidoscope-Papageno, but if you have an enhancement idea, feel free to open an issue report on GitHub and describe your ideas.
 
-An input can e.g. be defined as follows.
+All the following examples assume a Keyboardio Model01 keyboard is being used.
+
+An input for a key at position `row = 0, col = 7` can be defined as follows and named `LeftThumb1`.
 ```
 input: LeftThumb1 <KEYPOS> =  $ 0,  7 $
 ```
-This would allow the leftmost thumb key of the Model01 to be used as part of a pattern.
-The thumb key can further on be referenced by the name `LeftThumb1`. The string `$ 0,  7 $` defines the key's matrix
-position as `row = 0, col = 7`.
 
 ### Defining actions
 
-Before we define key patterns, we should concern ourselves with question what is supposed to happen once a pattern matches. Kaleidoscope-Papageno supports different types of actions that are going to be explained in the following.
+Pattern matching is only useful, if we assign actions to matching patterns. Kaleidoscope-Papageno supports different types of actions that we are going to explained in the following.
 
 #### Simple keycode actions
 
-The most common action is to trigger a key event with a given keycode.
+The most common action is to emit a keyboard event with a given keycode.
 ```
 action: Key_C <KEYCODE>
 ```
-Unsurprisingly, this will cause the printable key "C" be emitted once a
-pattern matches. As this type of actions is pretty common, `KEYCODE` actions for  keycodes that are defined by the stock firmware are define in the  
-file `glockenspiel/predefines.gls` in the Kaleidoscope-Papageno repository.
+This will cause the printable key "C" to be emitted once a
+pattern matches. As this type of action is pretty common, `KEYCODE`-actions for all keycodes that are defined by the stock firmware are define in the  
+file `glockenspiel/predefines.gls` that lives in the Kaleidoscope-Papageno repository.
+
 This file is included by Kaleidoscope-Papageno during the Glockenspiel
-compile. Thus, for standard keys, keycode actions just work out of the
-box. Be careful not to explicitly define actions for standard keys explicitly as those would collide with the definitions in `glockenspiel/predefines.gls` and therefore cause a Glockenspiel compiler errors.
+compile. This means, that for standard keys, keycode actions just work out of the
+box.
+
+Please, be careful not to explicitly define actions for any of the standard keys that are already listed in `glockenspiel/predefines.gls`. Otherwise, Glockenspiel compiler errors would result.
 
 If you want to use a non standard keycode alias which you defined in
 your C++ code somewhere (directly within the sketch file or included therein), you
 can define an explicit action.
 ```
+constexpr Key my_Special_Key = LCTRL(Key_A);
+/*
+glockenspiel_begin
+...
 action: my_Special_Key <KEYCODE>
+...
+glockenspiel_end
+*/
 ```
-___Note:___ `my_Special_Key` must either be a valid C++ symbol or pre-processor macro.
+___Note:___ `my_Special_Key` could either be a valid C++ symbol or a pre-processor macro.
 
 #### Complex keycode actions
 
-Of course, it is also possible to define complex keycodes as actions, e.g. a printable keys with active modifiers.
+It is also possible to define complex keycodes as actions within the Papageno definitions, e.g. a printable key with an active modifier.
 ```
 action: shiftCtrlC <COMPLEX_KEYCODE> =  $ LCTRL(LSHIFT(Key_C)) $
 ```
@@ -257,29 +262,31 @@ The above action can be referenced by the name `shiftCtrlC` when defining patter
 
 #### Matrix key position actions
 
-Another type of action is one that emits a key event at a given matrix position.
-This fools the firmware to assume that the respective key on the keyboard is  physically tapped.
+A third possible type of action is one that emits a key event at a given keyboard matrix position.
+This fools the firmware to assuming that the respective key on the keyboard is physically tapped.
 
 ```
 action: pressLED <KEYPOS> = $ 0, 6 $
 ```
-This action causes a key tap at position `row=0, col`.
+This action causes a key tap at position `row=0, col=6`.
 
-### User functions as actions
+#### User functions as actions
 
-The most general type of actions that are supported by Kaleidoscope-Papageno are user functions. A user function must have the following signature.
+Finally, the most general type of actions that are supported by Kaleidoscope-Papageno are user functions.
+
+A user function must have the following signature.
 ```cpp
 void user_callback(PPG_Count activation_flags, void *user_data)
 ```
 
-A user function is defined as follows.
+A user function action may e.g. be defined as follows.
 ```
 action: doubleTab <USER_FUNCTION> =  $ doubleTabCB, NULL $
 ```
 
-This example defines an action that causes the tab key to be tapped twice.
+It defines an action that makes the tab-key to be tapped twice when the a pattern matches that the action is assigned to.
 
-The callback function could read:
+An appropriate callback function could then read:
 ```cpp
 void doubleTabCB(PPG_Count activation_flags, void *user_data)
 {
@@ -293,19 +300,18 @@ void doubleTabCB(PPG_Count activation_flags, void *user_data)
    kaleidoscope::hid::sendKeyboardReport();
 }
 ```
-Please note the invokation of the two macros `PPG_CALLBACK_NO_REPEAT` and `PPG_CALLBACK_ONLY_ACTIVATION` at the top of the user function.
+Please note the invokation of the two macros `PPG_CALLBACK_NO_REPEAT` and `PPG_CALLBACK_ONLY_ACTIVATION` at the top of the callback.
 
-`PPG_CALLBACK_NO_REPEAT` marks the function to be called only once. If this macro wasn't there, the function would be called once in every firmware loop cycle as
-long as the last key is held that caused the pattern to match. It depends on the application case whether this is desired. Key repeat
+`PPG_CALLBACK_NO_REPEAT` informs Kaleidoscope-Papageno that the function wants to be called only once per match. If this macro wasn't there, the function would be called once in every firmware loop cycle as
+long as the last key is held, that finally caused the pattern match. It depends on the application case whether this is desired behavior. Key repeat
 can be useful in some cases, in others not.
 
 `PPG_CALLBACK_ONLY_ACTIVATION` causes the user function only to be called
-once when the pattern matches. If this macro is not used, the user function would be called another time when the key that caused the pattern to match is released.
+when the pattern matches. Without this macro, the user function would be called a second time when the key, that caused the pattern match, is released.
 
-___Important:___ Both of the above macros assume the first function argument of the user function to be called `activation_flags`.
+___Important:___ Both of the above macros require the first function argument of the user function to be called `activation_flags`.
 
-The callback function can be passed an additional `void *user_data` call argument. This is data that is to be passed once the function is invoked for a specific
-action. The user data that is passed to the actual call is defined in the `$ ... $` clause at the end of the action definition line. If you don't require any `user_data` just pass `NULL`.
+An action callback function must be passed an additional call argument `void *user_data`. This can be used to pass data to the callback function that is specific to the actual action. This is only relevant if an action callback is shared by different action definitions. The user data that is supposed to be passed is defined in the `$ ... $` clause at the end of the action definition line. If you don't require any `user_data`, just pass `NULL`.
 
 As an example, the `user_data` pointer could be used to pass a `Key` value to a user function, e.g. a function that adds the left shift modifier to the key that is passed.
 ```cpp
@@ -323,15 +329,18 @@ void shiftedKeyCB(PPG_Count activation_flags, void *user_data)
    handleKeyswitchEvent(LSHIFT(k), UNKNOWN_KEYSWITCH_LOCATION, WAS_PRESSED);
    kaleidoscope::hid::sendKeyboardReport();
 }
-
-```
-
-```
+...
+/*
+glockenspiel_begin
+...
 action: shifted_A <USER_FUNCTION> =  $ shiftedKeyCB, (void*)Key_A.raw $
+...
+glockenspiel_end
+*/
 ```
-This works due to the fact the `Key` struct on an atmega32u4 (used by the Keyboardio Model01) is a two-byte variable that thus has the same size as `void *`. This means that we pass the `Key` by value.
+This passes the key by reference, which works due to the fact the `Key` struct on an atmega32u4 (used by the Keyboardio Model01) is a two-byte variable that has the exact same size as `void *`.
 
-If you are not sure about the size of a variable that you want to pass to a user function, it is safest to rather pass by reference, i.e. passing the pointer to the variable after casting it to `void*`. But be careful not to pass pointers to local variables, which could easily lead to a crash of the entire firmware.
+If you are not sure about the size of a variable that you want to pass to a user function, it is safest to pass by-reference, instead of by-value. Pass a pointer to a variable after casting it to `void*`. But be careful not to pass pointers to local variables. This could easily crash the firmware.
 
 ### Referencing keys or actions by alias
 
@@ -340,19 +349,19 @@ Sometimes it is convenient to assign alias names to inputs or actions.
 alias: LeftOutermostThumb = LeftThumb1
 alias: myActionAlias = shifted_A
 ```
-In the above example an alias name `LeftOutermostThumb` is assigned to an input `LeftThumb1` and another alias to an already defined action.
+In the above example an alias name `LeftOutermostThumb` is assigned to input `LeftThumb1` and another alias to an already defined action.
 
 ### Defining patterns
 
-Patterns can be defined by arranging tokens (notes, clusters, chords).
+Patterns are defined by ordering tokens (notes, clusters, chords). Thereby
+tokens are separated by Glockenpiel's `->` operator.
 
-#### Multi key sequences
+#### Key sequences
 
-A multi key sequence is defined as a set of keys that have to be hit in
+A key sequence is defined as a set of keys that have to be pressed in
 a precise order for the pattern to match.
 
-Let's assume we have defined two inputs `LeftThumb1` and `RightThumb1`. We want
-an action to be called if they are hit one after the other.
+Let's assume we have defined two inputs (keys) `LeftThumb1` and `RightThumb1`.
 ```
 |RightThumb1| -> |LeftThumb1| : Key_Delete
 ```
@@ -360,22 +369,23 @@ This would cause `Key_Delete` to be emitted when the pattern matches.
 
 Of course, you can have key sequences with more than two keys if you want. Just add more inputs separated by `->`.
 
-In Papageno's jargon `|RightThumb1|` is called a *note* and the entire key sequence a *single note line*. This is because of the analogy to playing a piano.
+In Papageno's jargon `|RightThumb1|` is called a *note* and the entire key sequence a *single note line*, thereby using an analogy to musical melodies.
 
 #### Key clusters
 
 Key clusters are related to key sequences with the slight difference that
-the inputs can be activated in an arbitrary order. The only condition for the cluster to match is that all listed inputs (keys) have been activated (pressed) at least once.
+their inputs can be activated in an arbitrary order. A cluster matches once all associated inputs (keys) have been activated (pressed) at least once.
 
-A cluster of two thumb keys that triggers `Key_Enter`can be defined as follows. We hereby assume that `LeftThumb3` and `RightThumb2` have both already been defined as inputs.
+A cluster of two thumb keys that triggers `Key_Enter`can be defined as follows.
 ```
 {LeftThumb3, RightThumb2} : Key_Enter
 ```
+We hereby assume that `LeftThumb3` and `RightThumb2` have both already been defined as inputs.
 
 #### Key chords
 
 Key chords are more strict than clusters. They require all listed inputs
-to be activated at the same time for the action to be triggered.
+to be activated at the same time for the token to match and the action to be triggered.
 ```
 [LeftThumb3, RightThumb2] : Key_Enter
 ```
@@ -386,44 +396,47 @@ Please note the different brackets compared to the cluster example.
 
 Tap dances work the same way as known from plugin [Kaleidoscope-TapDance](https://github.com/keyboardio/Kaleidoscope-TapDance).
 
-If a key is supposed to be tapped multiple times to trigger an action, you can
-do so easily.
+It is easy to define an action for a key that is supposed to be tapped multiple times.
 ```
 |Special1|*2 : repeatLastCommand
 ```
 When the input `Special1` if activated (tapped) two times, the action `repeatLastCommand` will be triggered.
 
-It is common to assign different actions to a single key, depending on how often it is tapped. Say, we want to issue an ordinary string search of our text editor (user function `ordinarySearch`) in the current file once we hit key `Special3` twice, but a search across all files (user function `fileSearch`) when we hit the same key three times.
+__Important:__ The amout of taps that follows the `*` must be a literal integer constant. C/C++ symbols are not allowed here.
+
+Using tap dances, it is common to assign different actions to a single key, depending on how often it is tapped. Suppose, we want to issue an ordinary string search of our text editor (user function `ordinarySearch`) in the current file once we hit key `Special3` twice, but a search across all files (user function `fileSearch`) when we hit the same key four times. The Papageno pattern definition would read as follows.
 ```
-|Special3|*3 : ordinarySearch@2, fileSearch@3
+|Special3|*4 : ordinarySearch@2, fileSearch@4
 ```
-The maximum amount of taps (here 3) must be added after the definition of the token (note, cluster, chord) (`|Special3|*3`). The amount of taps that are associated with the different actions must follow the `@`.
+The maximum amount of taps (here 4) must be added after the definition of the token (note, cluster, chord) (here `|Special3|`). The amount of taps that are associated with the different actions must follow an `@` after the name of the action to trigger.
 
 #### Phrases
-If a sequence of tokens is used several times, it can be define as a phrase that can be reused by name when defining patterns.
+If a sequence of tokens is used several times, it can be given a name by defining a phrase. A named phrase can be referenced using the `#` operator.
 ```
 phrase: my_phrase = |Special1| -> |Special2|
+
 |Special3| -> #my_phrase: an_action
 |Special4| -> #my_phrase: an_action
 ```
 This triggers `an_action` it either `Special3, Special1, Special2` or `Special4, Special1, Special2` are activated.
 
-#### Extended tap dances
+#### Extended tap dances - dance with phrases
 
 Following the idea of tap dances that require a key to be hit several times,
-we can also define more complex "dances" that require whole patterns to be repeated.
+we can also define more complex "dances" that require whole phrases to be repeated.
 
-Assume you want to flash your keyboard once in a while with the latest firmware build. There's no need to unplug and replug the keyboard every time you flash. You can trigger flashing by means of the Model01's `rebootBootloader()` function. For this to be convenient but also safe from accidentally being caused, we define a user function.
+Assume we want to flash our keyboard once in a while with the latest firmware build. There's no need to unplug and replug the keyboard every time we flash. We can trigger flashing by calling the Model01 hardware's `rebootBootloader()` function. For this to be convenient but also safe from accidentally being triggered, we define a user function and trigger it through a magic keyboard gesture.
 ```cpp
 void rebootCB(PPG_Count activation_flags, void *user_data)
 {
    KeyboardHardware.rebootBootloader();
 }
 ```
-This function we want to trigger through a magic key combination that is unlikely to be issued. Hitting LED and ANY twice in a row might be unlikely enough to happen by accident.
+Hitting LED and ANY twice in a row might be unlikely enough to happen by accident.
 ```
 action: reboot <USER_FUNCTION> = $ rebootCB, NULL $
 phrase: reboot_phrase = |my_Key_LED| -> |my_Key_ANY|
+
 #reboot_phrase*2 : reboot
 ```
 
@@ -431,15 +444,15 @@ By using Glockenspiel's `#` operator, we "dereference" the phrase name `reboot_p
 
 #### Leader sequences
 
-A feature that already known from Kaleidoscope stock plugin [Kaleidoscope-Leader](https://github.com/keyboardio/Kaleidoscope-Leader), with the exception that Papageno's leader sequences are slightly more convenient and general.
+Another feature, already known from [Kaleidoscope-Leader](https://github.com/keyboardio/Kaleidoscope-Leader). But Papageno's leader sequences are slightly more convenient and general.
 
-To define a simple leader sequence, select an input as your leader input and add a sequence string to the definition. A sequence string can contain only alphabetic characters [a-zA-Z] which are treated as non-case sensitive. Every character is used to lookup an input that has been assigned the same name.
+To define a simple leader sequence, select an input as your leader input (key) and add a sequence string to the definition. A (input) sequence can be defined by a sequence of alphabetic characters [a-zA-Z]. Those are treated non-case sensitive, so it doesn't matter whether you write "abc", "aBc" or "ABC". Every character is used to lookup an input that has been assigned the same name (in lower case).
 
 ```
 input: my_lead_Key <KEYPOS> = $ 0, 0 $
 input: an_unrelated_Key <KEYPOS> = $ 2, 2 $
 
-% Define all those inputs that are supposed to be part of a sequence string.
+% Define and name those inputs that are supposed to be part of a sequence string.
 input: a = $ 2, 1 $
 input: b = $ 3, 5 $
 input: c = $ 3, 3 $
@@ -449,19 +462,21 @@ alias: d = an_unrelated_Key
 
 alias: my_abacabd_action = Key_Escape
 
-|my_lead_Key| -> "abacabd" : my_abacabd_action
+|my_lead_Key| -> "abacabd" : my_abacabd_action % "abacabd" is the sequence string.
 ```
 
-Whenever you press the lead key (here `my_lead_Key`), followed by the sequence `abacabd`, the action `my_abacabd_action` will be triggered.
+Whenever you press the lead key (here `my_lead_Key`), followed by the sequence of keys that matches `abacabd`, the action `my_abacabd_action` will be triggered. Pretty simple, isn't it?
 
-You can do the same without a lead key. Strictly speaking, due to the absence of the lead key, this is not a leader sequence anymore.
+You can also go without a lead key. Strictly speaking, due to the absence of the lead key, this is not a leader sequence anymore ;-)
 ```
 "abacabd" : my_abacabd_action
 ```
 
-As there are so many different possible alphabetic keyboard layouts (QWERTY, Dvorak, ...), no alphabetic key inputs are predefined.
+As there are so many different possible alphabetic keyboard layouts (QWERTY, Dvorak, ...), we did not predefine any alphabetic input keys.
 
-Sequence strings are equivalent to the respective inputs being added as a note line.
+#### Sequence strings instead of key sequences (single note lines)
+
+Sequence strings are equivalent to defining a single note line. This means that
 ```
 "abacabd" : my_abacabd_action
 ```
@@ -471,21 +486,22 @@ is equivalent to
 ```
 
 ### Timeout
-Kaleidoscope-Papageno supports a timeout that when it elapsed, ends the current pattern recognition.
-The timeout in `[ms]` can be defined as part of the Glockenspiel/Papageno code in your sketch.
+Kaleidoscope-Papageno supports a timeout that ends the current pattern recognition.
+This timeout in `[ms]` can be defined as part of the Glockenspiel/Papageno code in your sketch.
 ```
 default: event_timeout =  $ 200 $
 ```
 
 ### Action fallback
-Actions can also be assigned to tokens that are not necessarily at the end of the
+
+Actions can also be assigned to tokens that are not necessarily at the end of a
 pattern, e.g.
 
 ```
 |input_1| -> |input_2| : a_action -> |input_1| -> |input_2| : b_action
 ```
 
-If the event sequence (keypress sequence) `input_1, input_2` occurs before one of the following happens:
+If keys `input_1, input_2` are pressed and then one of the following happens:
 
 * timeout,
 * any non-input key is pressed,
@@ -495,16 +511,51 @@ If the event sequence (keypress sequence) `input_1, input_2` occurs before one o
 
 If the full event sequence `input_1, input_2,input_1, input_2` occurs, `b_action` is triggered.
 
-This is the same behavior as known from tap dances, but generalized for token sequences.
+This is the same behavior as known from tap dances, generalized to token sequences.
 
-## Building the plugin
+### Layers
+
+Keymap layers are an important concept in Kaleidoscope.
+Kaleidoscope-Papageno may also be assigned to layers. Papageno's layer system is therefore linked with
+that of Kaleidoscope. To define a pattern that is only active on layers above a
+specific number, including it, you can write the following.
+```
+layer: 1
+% all patterns that follow will be assigned to layer 1 and above
+```
+You can also use C/C++ identifiers for layers, say you use the C++ compile time
+constants `primaryLayer` and `secondaryLayer` to define the lowest layer.
+```cpp
+constexpr int primaryLayer = 0;
+constexpr int secondaryLayer = 1;
+/*
+glockenspiel_begin
+
+... input and action definitions ...
+
+layer: primaryLayer
+|input_1| -> |input_2| : action_1 % on layer primaryLayer
+
+layer: secondaryLayer
+|input_2| -> |input_1| : action_2 % on layer secondaryLayer
+
+glockenspiel_end
+*/
+```
+
+### The `$...$` syntax
+
+You might have wondered about the strange dollar signs that are used
+in input and action definitions. These solve the task of delimiting definitions that are expected to be C/C++ code, such as the function name and `user_data` in user function action definitions. As `$` is not a valid symbol in C/C++ code, we selected it as a delimiting character to avoid ambiguities. Just think of it the same as if it was `"..."` or `'...'`.
+
+## <a name="Building_the_plugin"></a>Building the plugin
 
 The following steps let you build and test Kaleidoscope-Papageno with a custom firmware. The general procedure
 is similar to the general build procedure described in the Leidokos-CMake README with some slight modifications.
 
-1. [Leidokos-CMake build step 1](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Prepare the build directory)
+1. Execute [Leidokos-CMake build step 1](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Prepare the build directory)
 
-2. [Leidokos-CMake build step 2](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Clone the Leidokos-CMake repository)
+2. Execute [Leidokos-CMake build step 2](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Clone the Leidokos-CMake repository)
 
 3. Prepare additional plugins
 
@@ -520,13 +571,13 @@ is similar to the general build procedure described in the Leidokos-CMake README
     git checkout <your_firmware_remote_branch>
     ```
 
-4. [Leidokos-CMake build step 3](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Setup the CMake build system)
+4. Execute [Leidokos-CMake build step 3](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Setup the CMake build system)
 
-    Make sure that your keyboard is plugged in before you repeat this step, so the keyboard (port and stuff) will be recognized by the build system.
+    Make sure that your keyboard is plugged in before you execute this step, so the keyboard (port and stuff...) will be recognized by the build system.
 
-5. [Leidokos-CMake build step 4](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Build)
+5. Execute [Leidokos-CMake build step 4](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Build)
 
-    You can also run [parallel builds](https://github.com/CapeLeidokos/Leidokos-CMake#parallel-builds).
+    You can also use [parallel builds](https://github.com/CapeLeidokos/Leidokos-CMake#parallel-builds).
 
     ___Important:___ For your firmware to build with Kaleidoscope-Papageno,
     your sketch file must contain at least an empty clause.
@@ -537,7 +588,6 @@ is similar to the general build procedure described in the Leidokos-CMake README
     */
     ```
     If this clause is missing, the build will fail.
-    Read further to find out about the meaning of this clause.
 
 6. Upload
 
@@ -546,4 +596,4 @@ is similar to the general build procedure described in the Leidokos-CMake README
    ```
 
   If the upload did not succeed, it is likely that your keyboard was not recognized by the build system. If this
-  happened, no problem. Just unplug and replug the keyboard, then repeat steps 4 and 6.
+  happened, don't panic. Just unplug and replug the keyboard, then repeat steps 4 and 6.
