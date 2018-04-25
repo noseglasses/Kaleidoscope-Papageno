@@ -7,11 +7,19 @@
 [st:broken]: https://img.shields.io/badge/broken-X-black.svg?style=flat&colorA=e05d44&colorB=494e52
 [st:experimental]: https://img.shields.io/badge/experimental----black.svg?style=flat&colorA=dfb317&colorB=494e52
 
-# Kaleidoscope-Papageno: Turn your keyboard into a magical instrument
+# Kaleidoscope-Papageno
 
-## Abstract
+#### Turn your keyboard into a magical instrument!
 
-Define multi-key tap-dances (key-sequences), chords, key-clusters a mixture of it all. [Papageno](https://github.com/noseglasses/papageno/) an advanced pattern matching library seamlessly integrates with Kaleidoscope to provide ultimate flexibility in the generation of multi-key gestures/key patterns. An automatized compile-based compression mechanism converts key-patterns to C/C++ code that represents an optimized, statically allocated search tree. Key patterns are specified directly in the firmware sketch, written in an easy to use domain specific language.
+Define multi-key tap-dances (key-sequences), chords, key-clusters, leader sequences a mixture of it all. [Papageno](https://github.com/noseglasses/papageno/) an advanced pattern matching library seamlessly integrates with Kaleidoscope to provide ultimate flexibility in the generation of multi-key gestures/key patterns. An automatized compile-based compression mechanism converts key-patterns to C/C++ code that represents an optimized, statically allocated search tree. Key patterns are specified directly in the firmware sketch, written in an easy to use domain specific language.
+
+#### Table of Contents
+
+[Motivation](#Motivation)<br>
+[Papageno - a pattern matching library](#Papageno - a pattern matching library)<br>
+[Prerequisites](#Prerequisites)<br>
+[Preparing the sketch](#Preparing the sketch)<br>
+[Building the plugin](#Building the plugin)
 
 ## Motivation
 
@@ -55,18 +63,18 @@ One possible solution for the given task would be to add indent
 
 From a neuromuscular point of view this key-assignment strategy is doubtlessly a good choice as it is fairly easy to learn. Moreover, it is rather intuitive as we assign a forward-backward relation to indentation and un-indentation with respect to the order of the two thumb keys being hit. This certainly aids memorizing our new key assignment.
 
-### Papageno - a pattern matching library
+## Papageno - a pattern matching library
 
 To bring the above example to life, we need a mechanism that is capable to recognize more or less complex keystroke patterns. The requirements described, among others,
 led to the development of [Papageno](https://github.com/noseglasses/papageno/), an advanced pattern matching library. Originally implemented as part of Kaleidoscope, Papageno emerged to a stand-alone multi-platform library that via this plugin seamlessly integrates with Kaleidoscope. It provides a variety of different ways to define patterns that go far beyond advanced tap-dances only.
 
-## Papageno as a Kaleidoscope plugin
+### Papageno as a Kaleidoscope plugin
 
 Papageno allows for the definition of general multi-key patterns. All of the different patterns that are supported the same efficient and optimized pattern matching algorithm.
 
 The heart of Papageno is a search tree that is established based on the definitions that are added to the firmware sketch file and compiled by Papageno's Glockenspiel compiler.
 
-## Compatibility with existing Kaleidoscope features
+### Compatibility with existing Kaleidoscope features
 
 The efficiency of Papageno's tree based pattern matching approach is one of the reasons why some features that were already part of Kaleidoscope, such as tap-dances and leader sequences, have been incorporated into Papageno \[Another reason is that they were just fun to implement based on Papageno ;-)\].
 
@@ -81,7 +89,7 @@ If a plugin is found to be incompatible, I will list it here as well.
 
 Please feel free to generate issue reports when you encounter any incompatibilities with other plugins.
 
-## Papageno as a wrapper to Kaleidoscope
+### Papageno as a wrapper to Kaleidoscope
 
 Papageno-Kaleidoscope is designed as a wrapper for the rest of Kaleidoscope. Any keystrokes are intercepted and passed through Papageno's pattern matching engine. Only if a series of keystrokes is identified as not being part of any defined pattern, it is passed back to the main Kaleidoscope engine and, thus, to other plugins.
 
@@ -98,58 +106,7 @@ To allow for more advanced functionality, Papageno provides arbitrary user callb
 As Kaleidoscope-Papageno builds and uses the *Glockenspiel* compiler that is part of the Papageno project, it requires extended build steps
 to be carried out. Such build steps can currently not be incorporated in the stock build system (Kaleidoscope-Builder). This is why Kaleidoscope-Papageno relies on [Leidokos-CMake](https://github.com/CapeLeidokos/Leidokos-CMake) as its current build system.
 
-## Usage
-
-### Building the plugin
-
-The following steps let you build and test Kaleidoscope-Papageno with a custom firmware. The general procedure
-is similar to the general build procedure described in the Leidokos-CMake README with some slight modifications.
-
-1. [Leidokos-CMake build step 1](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Prepare the build directory)
-
-2. [Leidokos-CMake build step 2](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Clone the Leidokos-CMake repository)
-
-3. Prepare additional plugins
-
-        ```bash
-        # Clone Kaleidoscope-Papageno
-        cd TARGET_DIR/hardware/keyboardio/avr/libraries
-        git clone --recursive https://github.com/noseglasses/Kaleidoscope-Papageno.git
-
-        # Switch to your own firmware mod
-        cd TARGET_DIR/hardware/keyboardio/avr/libraries/Model01-Firmware
-        git remote add <your_firmware_remote_name> <your_firmware_remote_URL>
-        git fetch <your_firmware_remote_name>
-        git checkout <your_firmware_remote_branch>
-        ```
-
-4. [Leidokos-CMake build step 3](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Setup the CMake build system)
-
-    Make sure that your keyboard is plugged in before you repeat this step, so the keyboard (port and stuff) will be recognized by the build system.
-
-5. [Leidokos-CMake build step 4](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Build)
-
-    You can also run [parallel builds](https://github.com/CapeLeidokos/Leidokos-CMake#parallel-builds).
-
-    ___Important:___ For your firmware sketch to build with Kaleidoscope-Papageno,
-    it must contain at least an empty
-  ```
-  glockenspiel_begin
-  glockenspiel_end
-  ```
-  clause somewhere in the sketch file. If this is missing the build will fail.
-  Read further to find out about the meaning of this clause.
-
-6. Upload
-
-  ```bash
-  cmake --build . --target upload
-  ```
-
-  If the upload did not succeed, it is likely that your keyboard was not recognized by the build system. If this
-  happened, no problem. Just unplug and replug the keyboard, then repeat steps 4 and 6.
-
-### Preparing the sketch
+## Preparing the sketch
 
 To use Kaleidoscope-Papageno in your firmware, include its main header at
 the top of your sketch.
@@ -198,6 +155,7 @@ void loop() {
 If you defined the macro `KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS`
 before including `Kaleidoscope-Papageno.h`, you need to add a small amount
 of boiler plate code to the very end of your sketch file, namely
+
 ```cpp
 extern "C" {
 #include "Kaleidoscope-Papageno-Sketch.hpp"
@@ -236,6 +194,17 @@ All Papageno definitions must be surrounded by `glockenspiel_begin` and
 `glockenspiel_end` as starting and ending tags to enable the Glockenspiel compiler to distinguish between Papageno definitions and C++ code.
 
 Papageno definitions may occur at any place in the sketch. Only one block of Papageno definitions is allowed.
+
+### Comments in Papageno/Glockenspiel code
+Everything that follows a `%` until the end of a line is considered part of the comment.
+```
+glockenspiel_begin
+
+% This is a comment.
+input: an_input <KEYPOS> = $ 1, 3 $ % This is a commented input.
+
+glockenspiel_end
+```
 
 ### Defining inputs
 
@@ -375,6 +344,8 @@ In the above example an alias name `LeftOutermostThumb` is assigned to an input 
 
 ### Defining patterns
 
+Patterns can be defined by arranging tokens (notes, clusters, chords).
+
 #### Multi key sequences
 
 A multi key sequence is defined as a set of keys that have to be hit in
@@ -428,6 +399,15 @@ It is common to assign different actions to a single key, depending on how often
 ```
 The maximum amount of taps (here 3) must be added after the definition of the token (note, cluster, chord) (`|Special3|*3`). The amount of taps that are associated with the different actions must follow the `@`.
 
+#### Phrases
+If a sequence of tokens is used several times, it can be define as a phrase that can be reused by name when defining patterns.
+```
+phrase: my_phrase = |Special1| -> |Special2|
+|Special3| -> #my_phrase: an_action
+|Special4| -> #my_phrase: an_action
+```
+This triggers `an_action` it either `Special3, Special1, Special2` or `Special4, Special1, Special2` are activated.
+
 #### Extended tap dances
 
 Following the idea of tap dances that require a key to be hit several times,
@@ -450,4 +430,120 @@ phrase: reboot_phrase = |my_Key_LED| -> |my_Key_ANY|
 By using Glockenspiel's `#` operator, we "dereference" the phrase name `reboot_phrase` and require it to be entered twice for the action to be triggered.
 
 #### Leader sequences
-TODO
+
+A feature that already known from Kaleidoscope stock plugin [Kaleidoscope-Leader](https://github.com/keyboardio/Kaleidoscope-Leader), with the exception that Papageno's leader sequences are slightly more convenient and general.
+
+To define a simple leader sequence, select an input as your leader input and add a sequence string to the definition. A sequence string can contain only alphabetic characters [a-zA-Z] which are treated as non-case sensitive. Every character is used to lookup an input that has been assigned the same name.
+
+```
+input: my_lead_Key <KEYPOS> = $ 0, 0 $
+input: an_unrelated_Key <KEYPOS> = $ 2, 2 $
+
+% Define all those inputs that are supposed to be part of a sequence string.
+input: a = $ 2, 1 $
+input: b = $ 3, 5 $
+input: c = $ 3, 3 $
+
+% You can also use alias, if necessary.
+alias: d = an_unrelated_Key
+
+alias: my_abacabd_action = Key_Escape
+
+|my_lead_Key| -> "abacabd" : my_abacabd_action
+```
+
+Whenever you press the lead key (here `my_lead_Key`), followed by the sequence `abacabd`, the action `my_abacabd_action` will be triggered.
+
+You can do the same without a lead key. Strictly speaking, due to the absence of the lead key, this is not a leader sequence anymore.
+```
+"abacabd" : my_abacabd_action
+```
+
+As there are so many different possible alphabetic keyboard layouts (QWERTY, Dvorak, ...), no alphabetic key inputs are predefined.
+
+Sequence strings are equivalent to the respective inputs being added as a note line.
+```
+"abacabd" : my_abacabd_action
+```
+is equivalent to
+```
+|a| -> |b| -> |a| -> |c| -> |a| -> |b| -> |d| : my_abacabd_action
+```
+
+### Timeout
+Kaleidoscope-Papageno supports a timeout that when it elapsed, ends the current pattern recognition.
+The timeout in `[ms]` can be defined as part of the Glockenspiel/Papageno code in your sketch.
+```
+default: event_timeout =  $ 200 $
+```
+
+### Action fallback
+Actions can also be assigned to tokens that are not necessarily at the end of the
+pattern, e.g.
+
+```
+|input_1| -> |input_2| : a_action -> |input_1| -> |input_2| : b_action
+```
+
+If the event sequence (keypress sequence) `input_1, input_2` occurs before one of the following happens:
+
+* timeout,
+* any non-input key is pressed,
+* any key is pressed that causes a pattern matching failure,
+
+`a_action` is triggered.
+
+If the full event sequence `input_1, input_2,input_1, input_2` occurs, `b_action` is triggered.
+
+This is the same behavior as known from tap dances, but generalized for token sequences.
+
+## Building the plugin
+
+The following steps let you build and test Kaleidoscope-Papageno with a custom firmware. The general procedure
+is similar to the general build procedure described in the Leidokos-CMake README with some slight modifications.
+
+1. [Leidokos-CMake build step 1](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Prepare the build directory)
+
+2. [Leidokos-CMake build step 2](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Clone the Leidokos-CMake repository)
+
+3. Prepare additional plugins
+
+    ```bash
+    # Clone Kaleidoscope-Papageno
+    cd TARGET_DIR/hardware/keyboardio/avr/libraries
+    git clone --recursive https://github.com/noseglasses/Kaleidoscope-Papageno.git
+
+    # Switch to your own firmware mod
+    cd TARGET_DIR/hardware/keyboardio/avr/libraries/Model01-Firmware
+    git remote add <your_firmware_remote_name> <your_firmware_remote_URL>
+    git fetch <your_firmware_remote_name>
+    git checkout <your_firmware_remote_branch>
+    ```
+
+4. [Leidokos-CMake build step 3](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Setup the CMake build system)
+
+    Make sure that your keyboard is plugged in before you repeat this step, so the keyboard (port and stuff) will be recognized by the build system.
+
+5. [Leidokos-CMake build step 4](https://github.com/CapeLeidokos/Leidokos-CMake#usage) (Build)
+
+    You can also run [parallel builds](https://github.com/CapeLeidokos/Leidokos-CMake#parallel-builds).
+
+    ___Important:___ For your firmware to build with Kaleidoscope-Papageno,
+    your sketch file must contain at least an empty clause.
+    ```
+    /*
+    glockenspiel_begin
+    glockenspiel_end
+    */
+    ```
+    If this clause is missing, the build will fail.
+    Read further to find out about the meaning of this clause.
+
+6. Upload
+
+   ```bash
+   cmake --build . --target upload
+   ```
+
+  If the upload did not succeed, it is likely that your keyboard was not recognized by the build system. If this
+  happened, no problem. Just unplug and replug the keyboard, then repeat steps 4 and 6.

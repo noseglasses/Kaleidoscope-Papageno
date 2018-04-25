@@ -16,7 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define KALEIDOSCOPE_PAPAGENO_POSTPONE_INITIALIZATION
+// Note: We define KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS
+//       here to suppress inclusion of the Papageno/Glockenspiel
+//       generated C/C++ code.
+//
+#define KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS
 #include <Kaleidoscope-Papageno.h>
 #include <kaleidoscope/hid.h>
 

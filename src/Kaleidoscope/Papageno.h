@@ -216,7 +216,7 @@ glockenspiel_end
 // 
 // Complex use, including the specification of user function actions,
 // requires to postpone inclusion of Kaleidoscope-Papageno-Sketch.hpp
-// which is caused by defining macro KALEIDOSCOPE_PAPAGENO_POSTPONE_INITIALIZATION
+// which is caused by defining macro KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS
 // before this header is included.
 //
 #ifndef KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS

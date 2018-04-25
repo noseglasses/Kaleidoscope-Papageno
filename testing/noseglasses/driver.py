@@ -249,12 +249,12 @@ class NoseglassesTest(TestDriver):
 
    def test9(self):
       
-      self.header("Search with ctrl-F")
+      self.header("Replace with ctrl-R")
       #
-      # |Special4|*2 : leftCTRL_F
+      # |Special4|*2 : leftCTRL_R
       #
       self.queueGroupedReportAssertions([
-         ReportKeysActive([keyF()], exclusively = True),
+         ReportKeysActive([keyR()], exclusively = True),
          ReportModifiersActive([keyLCtrl()], exclusively = True)
       ])
       self.queueGroupedReportAssertions([
