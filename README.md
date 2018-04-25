@@ -21,7 +21,7 @@ Define multi-key tap-dances (key-sequences), chords, key-clusters, leader sequen
 [Preparing the sketch](#Preparing_the_sketch)<br>
 [Building the plugin](#Building_the_plugin)
 
-## Motivation
+## <a name="Motivation"></a>Motivation
 
 ### Utilization of thumb keys on ergonomic keyboards
 
@@ -91,7 +91,7 @@ Layer fall through (see Papageno's documentation), works similar to the assignme
 
 It is most common to emit Kaleidoscope key-codes or key-events (matrix row/column) when a defined pattern matches a series of keystrokes. Papageno also allows arbitrary user callback functions to be used as actions, which can be supplied with user defined data to enable further customization.
 
-## Prerequisites
+## <a name="Prerequisites"></a>Prerequisites
 
 As Kaleidoscope-Papageno uses the *Glockenspiel* compiler that is build as part of the Papageno project, it requires extended build steps. Such extended build steps can currently not be incorporated in the stock build system Kaleidoscope-Builder. This is why Kaleidoscope-Papageno must rely on [Leidokos-CMake](https://github.com/CapeLeidokos/Leidokos-CMake) as its current build system.
 
