@@ -59,6 +59,7 @@ if(NOT EXISTS "${papageno_library_directory}")
          "-DPAPAGENO_ARDUINO_BUILD_DIR=${papageno_library_directory}"
          "${CMAKE_TOOLCHAIN_FILE_SPEC}"
          "${PAPAGENO_PLATFORM_SPEC}"
+         "-DPAPAGENO_BUILD_GLOCKENSPIEL=FALSE"
          "${module_source_dir}/3rd_party/Papageno"
       WORKING_DIRECTORY "${papageno_library_directory}"
    )

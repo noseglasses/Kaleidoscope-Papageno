@@ -53,7 +53,7 @@ extern "C" {
    // compiler.
    //
    __attribute__((weak)) 
-   void papageno_initialize_context() {}
+   void papageno_initialize_context(void) {}
    
 //    void serial_print(const char *c) {
 //       Serial.print(c);
