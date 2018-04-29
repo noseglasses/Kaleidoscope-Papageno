@@ -2,3 +2,4 @@
    modules:
       - url: https://github.com/noseglasses/Kaleidoscope.git
         commit: remotes/origin/papageno
+        name: __REMOVE_DEFAULT__
