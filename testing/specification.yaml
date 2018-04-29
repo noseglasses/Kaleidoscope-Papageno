@@ -1,0 +1,4 @@
+---
+   modules:
+      - url: https://github.com/noseglasses/Kaleidoscope.git
+        commit: papageno
