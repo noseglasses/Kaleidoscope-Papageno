@@ -78,6 +78,10 @@ add_dependencies(kaleidoscope_papageno_build kaleidoscope_papageno_configure)
 #
 get_filename_component(sketch_path "${KALEIDOSCOPE_FIRMWARE_SKETCH}" PATH)
 
+# Make the compiled Papageno header being found
+#
+include_directories("${sketch_path}")
+
 set(kaleidoscope_papageno_source "${sketch_path}/Kaleidoscope-Papageno-Sketch.hpp")
 
 message("KALEIDOSCOPE_FIRMWARE_SKETCH=${KALEIDOSCOPE_FIRMWARE_SKETCH}")
