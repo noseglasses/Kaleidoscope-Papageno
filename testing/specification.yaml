@@ -1,5 +1,5 @@
 ---
    modules:
       - url: https://github.com/noseglasses/Kaleidoscope.git
-        commit: remotes/origin/papageno
+        commit: remotes/origin/pr_keyboard_report_policy_choice
         name: __REMOVE_DEFAULT__
