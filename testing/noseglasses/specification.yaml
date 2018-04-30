@@ -1,3 +1,20 @@
 ---
    description: Tests noseglasses firmware sketch.
    name: Noseglasses_Firmware_Sketch
+   
+   modules:
+      - name: Kaleidoscope-LEDControl
+      - commit: __NONE__
+      - url:
+      
+      - name: Kaleidoscope-LED-ActiveModColor
+      - commit: __NONE__
+      - url:
+      
+      - name: Kaleidoscope-Macros
+      - commit: __NONE__
+      - url:
+      
+      - name: Kaleidoscope-LEDEffect-BootGreeting
+      - commit: __NONE__
+      - url:

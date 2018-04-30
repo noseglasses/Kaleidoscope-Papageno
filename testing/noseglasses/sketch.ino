@@ -16,7 +16,7 @@
 #include "Kaleidoscope-Papageno.h"
 
 // Support for keys that move the mouse
-#include "Kaleidoscope-MouseKeys.h"
+// #include "Kaleidoscope-MouseKeys.h"
 
 // Support for macros
 #include "Kaleidoscope-Macros.h"
@@ -27,7 +27,7 @@
 #include "Kaleidoscope-LED-ActiveModColor.h"
 
 // Support for an "LED off mode"
-#include "LED-Off.h"
+// #include "LED-Off.h"
 
 #include "Kaleidoscope-OneShot.h"
 
