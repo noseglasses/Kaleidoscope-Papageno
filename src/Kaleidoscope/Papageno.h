@@ -23,7 +23,8 @@
 // avr-gcc compiles files with .c ending with C name mangling
 //
 extern "C" {
- #include "papageno.h"
+#include "papageno.h"
+#include "ppg_settings.h"
 }
 
 namespace kaleidoscope {

@@ -25,6 +25,8 @@
 #include <kaleidoscope/hid.h>
 
 extern "C" {
+#include "ppg_event_buffer.h"
+#include "ppg_global.h"
 #include "detail/ppg_pattern_matching_detail.h"
 #include "detail/ppg_active_tokens_detail.h"
 #include "detail/ppg_context_detail.h"
@@ -459,7 +461,7 @@ void
       ::processKeycode(PPG_Count activation_flags, void *user_data)
 {   
    Key key;
-   key.raw = (uint16_t)user_data;
+   key.raw = (uint16_t)((uintptr_t)user_data);
       
    uint8_t keyState = kaleidoscope::papageno::getKeystate(
                   activation_flags & PPG_Action_Activation_Flags_Active);
@@ -485,7 +487,7 @@ void
 
 void processKeypos(PPG_Count activation_flags, void *user_data)
 {
-   uint16_t raw = (uint16_t)user_data;
+   uint16_t raw = (uint16_t)((uintptr_t)user_data);
    uint8_t row = raw >> 8;
    uint8_t col = raw & 0x00FF;
          
