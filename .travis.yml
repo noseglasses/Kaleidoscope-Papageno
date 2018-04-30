@@ -5,6 +5,9 @@ os:
  - linux
  - osx
  
+env:
+   - VERBOSE=1
+ 
 # Only test direct pushes to master
 #
 branches:
