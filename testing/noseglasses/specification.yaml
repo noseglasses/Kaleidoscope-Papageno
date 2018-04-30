@@ -5,22 +5,3 @@
    # List all the default modules that are needed
    #
    modules:
-      - url:
-        commit: __NONE__
-        name: Kaleidoscope-LEDControl
-        
-      - url:
-        commit: __NONE__
-        name: Kaleidoscope-LED-ActiveModColor
-        
-      - url:
-        commit: __NONE__
-        name: Kaleidoscope-Macros
-        
-      - url:
-        commit: __NONE__
-        name: Kaleidoscope-LEDEffect-BootGreeting
-        
-      - url:
-        commit: __NONE__
-        name: Kaleidoscope-Focus

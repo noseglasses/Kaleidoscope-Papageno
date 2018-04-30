@@ -15,29 +15,7 @@
 #define KALEIDOSCOPE_PAPAGENO_HAVE_USER_FUNCTIONS
 #include "Kaleidoscope-Papageno.h"
 
-// Support for keys that move the mouse
-// #include "Kaleidoscope-MouseKeys.h"
-
-// Support for macros
-#include "Kaleidoscope-Macros.h"
-
-// Support for controlling the keyboard's LEDs
-#include "Kaleidoscope-LEDControl.h"
-
-#include "Kaleidoscope-LED-ActiveModColor.h"
-
-// Support for an "LED off mode"
-// #include "LED-Off.h"
-
 #include "Kaleidoscope-OneShot.h"
-
-// Support for the "Boot greeting" effect, which pulses the 'LED' button for 10s
-// when the keyboard is connected to a computer (or that computer is powered on)
-#include "Kaleidoscope-LEDEffect-BootGreeting.h"
-
-enum { MACRO_VERSION_INFO,
-       MACRO_ANY
-     };
 
 enum { NORMAN, M1, M2, M3 }; // layers
 
@@ -106,23 +84,6 @@ const Key keymaps[][ROWS][COLS] PROGMEM = {
 
 };
 
-static void versionInfoMacro(uint8_t keyState) {
-  if (keyToggledOn(keyState)) {
-    Macros.type(PSTR("Keyboardio Model 01 - Kaleidoscope "));
-    Macros.type(PSTR(BUILD_INFORMATION));
-  }
-}
-
-const macro_t *macroAction(uint8_t macroIndex, uint8_t keyState) {
-  switch (macroIndex) {
-
-  case MACRO_VERSION_INFO:
-    versionInfoMacro(keyState);
-    break;
-   }
-  return MACRO_NONE;
-}
-
 /** The 'setup' function is one of the two standard Arduino sketch functions.
   * It's called when your keyboard first powers up. This is where you set up
   * Kaleidoscope and any plugins.
@@ -130,35 +91,14 @@ const macro_t *macroAction(uint8_t macroIndex, uint8_t keyState) {
 
 void setup() {
    
-   // For usb serial debugging
-   //
-//    Serial.begin(9600);
-//    Serial.println("setup");
-   
   // First, call Kaleidoscope's internal setup function
   Kaleidoscope.setup();
 
-    
-// #if 0
-  // Next, tell Kaleidoscope which plugins you want to use.
-  // The order can be important. For example, LED effects are
-  // added in the order they're listed here.
   Kaleidoscope.use(
     
     &Papageno,
  
-    &OneShot,
-    
-    // LEDControl provides support for other LED modes
-    &LEDControl,
-        
-    // We start with the LED effect that turns off all the LEDs.
-//     &LEDOff,
-    
-    &ActiveModColorEffect,
-    
-    // The boot greeting effect pulses the LED button for 10 seconds after the keyboard is first connected
-    &BootGreetingEffect
+    &OneShot
   ); 
 }
 
@@ -229,7 +169,7 @@ action: umlaut_O <USER_FUNCTION> =  $ umlautCB, (void*)Key_O.raw $
 action: umlaut_U <USER_FUNCTION> =  $ umlautCB, (void*)Key_U.raw $ 
 action: umlaut_S <COMPLEX_KEYCODE> =  $ RALT(Key_S) $ 
 
-action: toggleLEDEffect <COMPLEX_KEYCODE> =  $ Key_LEDEffectNext $ 
+%action: toggleLEDEffect <COMPLEX_KEYCODE> =  $ Key_LEDEffectNext $ 
 
 action: reboot <USER_FUNCTION> =  $ rebootCB, NULL $ 
 
@@ -274,7 +214,7 @@ action: reboot <USER_FUNCTION> =  $ rebootCB, NULL $
 
 |Special6|*2 : shiftCtrlC
 
-|NG_Prog_Key|*5 : toggleLEDEffect@2, reboot@5
+%|NG_Prog_Key|*5 : toggleLEDEffect@2, reboot@5
 
 % Assign german umlauts as tripple taps to
 % suitable and non-colliding (digraphs!) keys of the home row
