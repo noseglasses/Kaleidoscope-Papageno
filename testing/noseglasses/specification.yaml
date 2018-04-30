@@ -2,6 +2,8 @@
    description: Tests noseglasses firmware sketch.
    name: Noseglasses_Firmware_Sketch
    
+   # List all the default modules that are needed
+   #
    modules:
       - url:
         commit: __NONE__
@@ -18,3 +20,7 @@
       - url:
         commit: __NONE__
         name: Kaleidoscope-LEDEffect-BootGreeting
+        
+      - url:
+        commit: __NONE__
+        name: Kaleidoscope-Focus
