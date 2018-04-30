@@ -94,7 +94,7 @@ add_custom_command(
       -i "${KALEIDOSCOPE_MODULE_SOURCE_DIR}/glockenspiel/predefines.gls"
       -i "${KALEIDOSCOPE_FIRMWARE_SKETCH}"
       -o "${kaleidoscope_papageno_source}"
-      -p "Kaleidoscope/Papageno.h"
+      -p "Kaleidoscope/KPapageno.hpp"
    WORKING_DIRECTORY "${KALEIDOSCOPE_MODULE_SOURCE_DIR}"
 )
 

@@ -18,4 +18,4 @@
 
 #pragma once
 
-#include <Kaleidoscope/Papageno.h>
+#include <Kaleidoscope/KPapageno.hpp>

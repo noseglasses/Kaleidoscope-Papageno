@@ -24,7 +24,6 @@
 //
 extern "C" {
 #include "papageno.h"
-#include "ppg_settings.h"
 }
 
 namespace kaleidoscope {

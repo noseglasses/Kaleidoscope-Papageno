@@ -25,8 +25,6 @@
 #include <kaleidoscope/hid.h>
 
 extern "C" {
-#include "ppg_event_buffer.h"
-#include "ppg_global.h"
 #include "detail/ppg_pattern_matching_detail.h"
 #include "detail/ppg_active_tokens_detail.h"
 #include "detail/ppg_context_detail.h"
