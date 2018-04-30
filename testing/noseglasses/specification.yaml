@@ -5,3 +5,6 @@
    # List all the default modules that are needed
    #
    modules:
+      - url:
+        commit: __NONE__
+        name: Kaleidoscope-OneShot
