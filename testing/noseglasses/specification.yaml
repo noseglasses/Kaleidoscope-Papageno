@@ -3,18 +3,18 @@
    name: Noseglasses_Firmware_Sketch
    
    modules:
-      - name: Kaleidoscope-LEDControl
-      - commit: __NONE__
       - url:
-      
-      - name: Kaleidoscope-LED-ActiveModColor
-      - commit: __NONE__
+        commit: __NONE__
+        name: Kaleidoscope-LEDControl
+        
       - url:
-      
-      - name: Kaleidoscope-Macros
-      - commit: __NONE__
+        commit: __NONE__
+        name: Kaleidoscope-LED-ActiveModColor
+        
       - url:
-      
-      - name: Kaleidoscope-LEDEffect-BootGreeting
-      - commit: __NONE__
+        commit: __NONE__
+        name: Kaleidoscope-Macros
+        
       - url:
+        commit: __NONE__
+        name: Kaleidoscope-LEDEffect-BootGreeting
