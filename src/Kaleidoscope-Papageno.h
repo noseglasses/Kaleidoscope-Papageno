@@ -18,4 +18,9 @@
 
 #pragma once
 
+extern "C" {
+#include "papageno.h"
+}
+
+
 #include <Kaleidoscope/KPapageno.hpp>

@@ -96,13 +96,14 @@ void setup() {
 
   Kaleidoscope.use(
     
-    &Papageno,
- 
-    &OneShot
+      &Papageno,
+
+      &OneShot
   ); 
 }
 
 void loop() {
+//    Kaleidoscope.loop();
   Papageno.loop();
 }
 

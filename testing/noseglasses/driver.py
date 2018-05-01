@@ -81,6 +81,8 @@ class NoseglassesTest(TestDriver):
       self.ng_Key_C = (3,  3)
       self.ng_Key_X = (3,  2)
       self.ng_Key_Z = (3,  1)
+      self.ng_Key_H = (2,  14)
+      self.ng_Key_W = (1,  2)
             
       self.ng_Key_Quote = (3, 13)
             
@@ -804,38 +806,66 @@ class NoseglassesTest(TestDriver):
       self.keyTap("ng_Key_X")
       self.checkStatus()
       
+   def test31(self):
+      
+      self.header(":w")
+            
+      # Entering ':w' should not print ':W'
+      #
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keySemicolon()], exclusively = True),
+         ReportModifiersActive([keyLShift()], exclusively = True)
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportKeysActive([keyW()], exclusively = True),
+         ReportAllModifiersInactive()
+      ])
+      self.queueGroupedReportAssertions([
+         ReportEmpty()
+      ])
+
+      self.keyTap("rightThumb2")
+      self.keyDownWait("ng_Key_H")
+      self.keyTap("ng_Key_W")
+      self.keyUpWait("ng_Key_H")
+      self.checkStatus()
+      
    def runTestSeries(self):
       
-      self.test1()
-      self.test2()
-      self.test3()
-      self.test4()
-      self.test5()
-      self.test6()
-      self.test7()
-      self.test8()
-      self.test9()
-      self.test10()
-      self.test11()
-      self.test12()
-      self.test13()
-      self.test14()
-      self.test15()
-      self.test16()
-      self.test17()
-      self.test18()
-      self.test19()
-      self.test20()
-      self.test21()
-      self.test22()
-      self.test23()
-      self.test24()
-      self.test25()
-      self.test26()
-      self.test27()
-      self.test28()
-      self.test29()
-      self.test30()
+      #self.test1()
+      #self.test2()
+      #self.test3()
+      #self.test4()
+      #self.test5()
+      #self.test6()
+      #self.test7()
+      #self.test8()
+      #self.test9()
+      #self.test10()
+      #self.test11()
+      #self.test12()
+      #self.test13()
+      #self.test14()
+      #self.test15()
+      #self.test16()
+      #self.test17()
+      #self.test18()
+      #self.test19()
+      #self.test20()
+      #self.test21()
+      #self.test22()
+      #self.test23()
+      #self.test24()
+      #self.test25()
+      #self.test26()
+      #self.test27()
+      #self.test28()
+      #self.test29()
+      #self.test30()
+      self.test31()
       
 def main():
     
